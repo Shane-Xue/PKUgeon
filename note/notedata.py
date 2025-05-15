@@ -33,7 +33,7 @@ class Note:
     decision: DecisionLevel
 
     def __lt__(self, other):
-        return self.time < other.time or (self.time == other.time and self.path < other.path)
+        return self.path < other.path or (self.path == other.path and self.time < other.time)
 
 
 @dataclass

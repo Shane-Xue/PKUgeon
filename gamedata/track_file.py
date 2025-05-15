@@ -4,11 +4,12 @@
 
 import json
 from ..note import notedata
+from config import *
 
 
 class TrackFile:
     def __init__(self):
-        self.notes = []
+        self.notes: list[list[notedata.Note]] = [[] for i in range(PATHS)]
         self.bpm = 0
         self.duration_ms = 0
 
@@ -21,15 +22,16 @@ def read_track_file(filename: str) -> TrackFile:
         ret.bpm = int(data['bpm'])
         for note in data['notes']:
             if note['type'] == 'tap':
-                ret.notes.append(notedata.Note(notedata.NoteType.TAP,
-                                               float(note['time']),
-                                               int(note['path']),
-                                               notedata.DecisionLevel.MISS))
+                ret.notes[int(note['path'])].append(notedata.Note(notedata.NoteType.TAP,
+                                                    float(note['time']),
+                                                    int(note['path']),
+                                                    notedata.DecisionLevel.MISS))
             elif note['type'] == 'hold':
-                ret.notes.append(notedata.Hold(notedata.NoteType.HOLD,
-                                               float(note['time']),
-                                               int(note['path']),
-                                               notedata.DecisionLevel.MISS,
-                                               float(note['interval'])))
-        ret.notes.sort()
+                ret.notes[int(note['path'])].append(notedata.Hold(notedata.NoteType.HOLD,
+                                                    float(note['time']),
+                                                    int(note['path']),
+                                                    notedata.DecisionLevel.MISS,
+                                                    float(note['interval'])))
+        for i in range(PATHS):
+            ret.notes.sort()
     return ret
