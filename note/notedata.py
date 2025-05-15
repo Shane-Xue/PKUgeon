@@ -14,6 +14,7 @@ class NoteType(Enum):
 
 
 class DecisionLevel(Enum):
+    NONE = 0
     MISS = auto()
     GOOD = auto()
     GREAT = auto()

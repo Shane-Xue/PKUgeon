@@ -21,10 +21,13 @@ class NoteManager:
 
     def update(self, delta: float):
         self.gametime += delta
-        # dispose some notes and set self.disposed
         for p in range(PATHS):
+            # dispose some notes and set self.disposed
             for i in range(self.disposed[p], self.created[p]):
-                if self.notes[p][i].time <= self.gametime + GOOD_INTERVAL:
+                if self.notes[p][i].decision != notedata.DecisionLevel.NONE:
+                    self.disposed += 1
+                elif self.notes[p][i].time <= self.gametime + GOOD_INTERVAL:
+                    self.notes[p][i].decision = notedata.DecisionLevel.MISS
                     event.post(event.Event(en.DISPOSE_NOTE, {"path": p, "id": i, "notedata": self.notes[i]}))
                     self.disposed += 1
                 else:
@@ -36,3 +39,20 @@ class NoteManager:
                     self.created += 1
                 else:
                     break
+
+    def decide(self, path: int):
+        i = self.disposed[path]
+        while self.notes[path][i].decision != notedata.DecisionLevel.NONE:
+            i += 1
+        delta = self.notes[path][i].time - self.gametime
+        if delta > MISS_INTERVAL:
+            return
+        if abs(delta) < PERFECT_INTERVAL:
+            self.notes[path][i].decision = notedata.DecisionLevel.PERFECT
+        elif abs(delta) < GREAT_INTERVAL:
+            self.notes[path][i].decision = notedata.DecisionLevel.GREAT
+        elif abs(delta) < GOOD_INTERVAL:
+            self.notes[path][i].decision = notedata.DecisionLevel.GOOD
+        else:
+            self.notes[path][i].decision = notedata.DecisionLevel.MISS
+        event.post(event.Event(en.DISPOSE_NOTE, {"path": path, "id": i, "notedata": self.notes[i]}))
