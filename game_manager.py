@@ -52,7 +52,6 @@ class GameManager:
 
     def game_start(self):
         self.status = GameManager.Status.STARTED
-        event.post(event.Event(en.MUSIC_START, {"start_time": self.musictime, "file": self.trackfile.musicfile}))
         # todo
 
     def update(self, delta: float):

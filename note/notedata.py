@@ -13,6 +13,13 @@ class NoteType(Enum):
     HOLD = auto()
 
 
+class DecisionLevel(Enum):
+    MISS = auto()
+    GOOD = auto()
+    GREAT = auto()
+    PERFECT = auto()
+
+
 @dataclass
 class Note:
     """
@@ -23,6 +30,7 @@ class Note:
     type: NoteType
     time: float
     path: int
+    decision: DecisionLevel
 
     def __lt__(self, other):
         return self.time < other.time or (self.time == other.time and self.path < other.path)

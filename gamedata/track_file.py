@@ -23,11 +23,13 @@ def read_track_file(filename: str) -> TrackFile:
             if note['type'] == 'tap':
                 ret.notes.append(notedata.Note(notedata.NoteType.TAP,
                                                float(note['time']),
-                                               int(note['path'])))
+                                               int(note['path']),
+                                               notedata.DecisionLevel.MISS))
             elif note['type'] == 'hold':
                 ret.notes.append(notedata.Hold(notedata.NoteType.HOLD,
                                                float(note['time']),
                                                int(note['path']),
+                                               notedata.DecisionLevel.MISS,
                                                float(note['interval'])))
         ret.notes.sort()
     return ret
