@@ -5,3 +5,8 @@ config.py
 """
 
 GAP_TIME = 5  # 进入游戏后的间隙时间
+
+
+PERFECT_INTERVAL = 30  # ms
+GREAT_INTERVAL = 60  # ms
+GOOD_INTERVAL = 100  # ms

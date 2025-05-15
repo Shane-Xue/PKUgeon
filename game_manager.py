@@ -13,9 +13,10 @@ from enum import Enum, auto
 
 class GameManager:
     """
-    gametime: 游戏进程时间，直接控制游戏内各“可视”元素，比如note
-
-    musictime: 音乐时间，仅用于控制音乐播放，以此达到调整按键延迟
+    :ivar gametime: 游戏进程时间，直接控制游戏内各“可视”元素，比如note
+    :ivar musictime: 音乐时间，仅用于控制音乐播放，以此达到调整按键延迟
+    :ivar note_queue: 按照时间排序的note队列
+    :ivar status: GameManager目前的状态
     """
     class Status(Enum):
         INITIALIZED = auto()
@@ -23,9 +24,9 @@ class GameManager:
         STARTED = auto()
         STOPPED = auto()
 
-    def __init__(self, userprofile: gd.user_profile.UserProfile, trackfile: gd.track_file.TrackFile):
+    def __init__(self, userprofile: gd.user_profile.UserProfile, track_file_name: str):
         self.userprofile = userprofile
-        self.trackfile = trackfile
+        self.track_file_name = track_file_name
         self.gametime = -config.GAP_TIME
         self.musictime = userprofile.latency - config.GAP_TIME
         self.note_queue = None
@@ -38,7 +39,8 @@ class GameManager:
         2. 读取music file
         """
         self.status = GameManager.Status.READY
-        # todo
+        # todo 读取track file
+        # todo 读取music file
 
     def game_start(self):
         self.status = GameManager.Status.STARTED
