@@ -14,3 +14,6 @@ class UserProfile:
         self.flow_speed = 5
         self.latency = 0
 
+    def pre_creation_latency(self):
+        return 5000 / self.flow_speed
+

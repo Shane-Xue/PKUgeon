@@ -10,6 +10,7 @@ import gamedata as gd
 import config
 from enum import Enum, auto
 from collections import deque
+from note.note_manager import NoteManager
 
 
 class GameManager:
@@ -30,10 +31,10 @@ class GameManager:
         self.track_file_name = track_file_name
         self.gametime = -config.GAP_TIME
         self.musictime = userprofile.latency - config.GAP_TIME
-        self.note_queue = None
         self.bpm = None
         self.duration_ms = None
         self.status = GameManager.Status.INITIALIZED
+        self.notemgr = None
 
     def prepare(self):
         """
@@ -44,9 +45,9 @@ class GameManager:
         self.status = GameManager.Status.READY
         # 读取track file
         trackfile = gd.track_file.read_track_file(self.track_file_name)
-        self.note_queue = deque(trackfile.notes)
         self.bpm = trackfile.bpm
         self.duration_ms = trackfile.duration_ms
+        self.notemgr = NoteManager(trackfile.notes, self.gametime, self.userprofile.pre_creation_latency())
 
         # todo 读取music file
 

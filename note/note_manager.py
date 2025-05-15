@@ -41,6 +41,9 @@ class NoteManager:
                     break
 
     def decide(self, path: int):
+        """
+        判定path轨道上的note
+        """
         i = self.disposed[path]
         while self.notes[path][i].decision != notedata.DecisionLevel.NONE:
             i += 1
