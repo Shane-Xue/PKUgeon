@@ -3,7 +3,7 @@
 """
 
 import json
-from .. import notes
+from ..note import notedata
 
 
 class TrackFile:
@@ -21,12 +21,13 @@ def read_track_file(filename: str) -> TrackFile:
         ret.bpm = int(data['bpm'])
         for note in data['notes']:
             if note['type'] == 'tap':
-                ret.notes.append(notes.Note(notes.NoteType.TAP,
-                                            float(note['time']),
-                                            int(note['path'])))
+                ret.notes.append(notedata.Note(notedata.NoteType.TAP,
+                                               float(note['time']),
+                                               int(note['path'])))
             elif note['type'] == 'hold':
-                ret.notes.append(notes.Hold(notes.NoteType.HOLD,
-                                            float(note['time']),
-                                            int(note['path']),
-                                            float(note['interval'])))
+                ret.notes.append(notedata.Hold(notedata.NoteType.HOLD,
+                                               float(note['time']),
+                                               int(note['path']),
+                                               float(note['interval'])))
+        ret.notes.sort()
     return ret

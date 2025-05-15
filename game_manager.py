@@ -9,6 +9,7 @@ import event_number as en
 import gamedata as gd
 import config
 from enum import Enum, auto
+from collections import deque
 
 
 class GameManager:
@@ -30,6 +31,8 @@ class GameManager:
         self.gametime = -config.GAP_TIME
         self.musictime = userprofile.latency - config.GAP_TIME
         self.note_queue = None
+        self.bpm = None
+        self.duration_ms = None
         self.status = GameManager.Status.INITIALIZED
 
     def prepare(self):
@@ -39,7 +42,12 @@ class GameManager:
         2. 读取music file
         """
         self.status = GameManager.Status.READY
-        # todo 读取track file
+        # 读取track file
+        trackfile = gd.track_file.read_track_file(self.track_file_name)
+        self.note_queue = deque(trackfile.notes)
+        self.bpm = trackfile.bpm
+        self.duration_ms = trackfile.duration_ms
+
         # todo 读取music file
 
     def game_start(self):
@@ -49,7 +57,7 @@ class GameManager:
 
     def update(self, delta: float):
         """
-        :param delta: 单位为ms
+        :param delta: 距上次update经过的时间，单位为ms
         """
         self.gametime += delta
         self.musictime += delta

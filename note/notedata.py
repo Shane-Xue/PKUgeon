@@ -1,3 +1,9 @@
+"""
+定义了各类型的note
+注意这些只是note的数据表示，并不是在屏幕上移动的真正的note对象。
+note对象由NoteManager创建和销毁
+"""
+
 from dataclasses import dataclass
 from enum import Enum, auto
 
