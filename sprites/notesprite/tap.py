@@ -18,7 +18,7 @@ class TapSprite(pygame.sprite.Sprite):
         if self.parent is not None:
             t1 = self.calc_midbottom(gametime, self.decision_time)
             t2 = self.parent.rect.midbottom
-            self.rect.midbottom = (t1[0] + t2[0], t1[1] + t2[1])
+            self.rect.midbottom = (t1[0] + t2[0], t1[1])
         else:
             self.rect.midbottom = self.calc_midbottom(gametime, self.decision_time)
 
