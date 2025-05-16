@@ -61,4 +61,10 @@ class GameManager:
         self.gametime += delta
         self.musictime += delta
         self.notemgr.update(delta)
+        if self.gametime >= self.duration_ms + config.GAP_TIME:
+            event.post(event.Event(en.GAME_OVER))
+            self.status = GameManager.Status.STOPPED
         # todo
+
+    def decide(self, path: int):
+        self.notemgr.decide(path)

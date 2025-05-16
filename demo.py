@@ -43,7 +43,24 @@ def main():
                 else:
                     print("error: unsupported note type")
             elif event.type == en.DISPOSE_NOTE:
+                data: notedata.Note = event.dict['notedata']
+                match data.decision:
+                    case notedata.DecisionLevel.MISS: print("MISS")
+                    case notedata.DecisionLevel.PERFECT: print("PERFECT")
+                    case notedata.DecisionLevel.GREAT: print("GREAT")
+                    case notedata.DecisionLevel.GOOD: print("GOOD")
                 notesprite[event.dict['path']][event.dict['id']].kill()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_d:
+                    gamemgr.decide(0)
+                elif event.key == pygame.K_f:
+                    gamemgr.decide(1)
+                elif event.key == pygame.K_j:
+                    gamemgr.decide(2)
+                elif event.key == pygame.K_k:
+                    gamemgr.decide(3)
+            elif event.type == en.GAME_OVER:
+                going = False
         gamemgr.update(time.get_time())
         pathgroup.update(gamemgr.gametime)
         pathgroup.draw(screen)
@@ -59,9 +76,11 @@ def random_generate():
     trkdata = {'duration_ms': 60000, 'bpm': 60, 'notes': []}
     # 全部弄成8分好了
     t = 2000
+    r = t
     while t < 60000:
+        r = r * 313 % 997
         trkdata['notes'].append({'type': 'tap',
-                                 'path': int(t * 997 % 4),
+                                 'path': int(r % 4),
                                  'time': t,
                                  })
         t += 1000 / 8
