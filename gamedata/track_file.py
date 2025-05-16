@@ -3,7 +3,7 @@
 """
 
 import json
-from ..note import notedata
+from note import notedata
 from config import *
 
 

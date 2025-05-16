@@ -17,7 +17,6 @@ class GameManager:
     """
     :ivar gametime: 游戏进程时间，直接控制游戏内各“可视”元素，比如note
     :ivar musictime: 音乐时间，仅用于控制音乐播放，以此达到调整按键延迟
-    :ivar note_queue: 按照时间排序的note队列
     :ivar status: GameManager目前的状态
     """
     class Status(Enum):
@@ -61,4 +60,5 @@ class GameManager:
         """
         self.gametime += delta
         self.musictime += delta
+        self.notemgr.update(delta)
         # todo
