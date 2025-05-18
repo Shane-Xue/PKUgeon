@@ -12,6 +12,9 @@ class TrackFile:
         self.bpm = 0
         self.duration_ms = 0
 
+    def add(self, note):
+        self.notes.append(note)
+
 
 def read_track_file(filename: str) -> TrackFile:
     ret = TrackFile()
@@ -30,3 +33,26 @@ def read_track_file(filename: str) -> TrackFile:
                                             int(note['path']),
                                             float(note['interval'])))
     return ret
+
+def write_track_file(filename: str, track_file: TrackFile):
+    data = {
+        'duration_ms': track_file.duration_ms,
+        'bpm': track_file.bpm,
+        'notes': []
+    }
+    for note in track_file.notes:
+        if isinstance(note, notes.Note):
+            data['notes'].append({
+                'type': 'tap',
+                'time': note.time,
+                'path': note.path
+            })
+        elif isinstance(note, notes.Hold):
+            data['notes'].append({
+                'type': 'hold',
+                'time': note.time,
+                'path': note.path,
+                'interval': note.interval
+            })
+    with open(filename, 'w') as f:
+        json.dump(data, f, indent=4)
