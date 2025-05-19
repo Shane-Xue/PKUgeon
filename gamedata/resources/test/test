@@ -1,0 +1,307 @@
+{
+    "duration_ms": 60000,
+    "bpm": 120,
+    "start_time": 0,
+    "notes": [
+        {
+            "type": "tap",
+            "time": 500.0,
+            "path": 0
+        },
+        {
+            "type": "tap",
+            "time": 1500.0,
+            "path": 0
+        },
+        {
+            "type": "tap",
+            "time": 2500.0,
+            "path": 0
+        },
+        {
+            "type": "tap",
+            "time": 3500.0,
+            "path": 3
+        },
+        {
+            "type": "tap",
+            "time": 4500.0,
+            "path": 3
+        },
+        {
+            "type": "tap",
+            "time": 5500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 6500.0,
+            "path": 3
+        },
+        {
+            "type": "tap",
+            "time": 7500.0,
+            "path": 0
+        },
+        {
+            "type": "tap",
+            "time": 8500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 9500.0,
+            "path": 2
+        },
+        {
+            "type": "tap",
+            "time": 10500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 11500.0,
+            "path": 2
+        },
+        {
+            "type": "tap",
+            "time": 12500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 13500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 14500.0,
+            "path": 3
+        },
+        {
+            "type": "tap",
+            "time": 15500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 16500.0,
+            "path": 3
+        },
+        {
+            "type": "tap",
+            "time": 17500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 18500.0,
+            "path": 2
+        },
+        {
+            "type": "tap",
+            "time": 19500.0,
+            "path": 2
+        },
+        {
+            "type": "tap",
+            "time": 20500.0,
+            "path": 2
+        },
+        {
+            "type": "tap",
+            "time": 21500.0,
+            "path": 3
+        },
+        {
+            "type": "tap",
+            "time": 22500.0,
+            "path": 3
+        },
+        {
+            "type": "tap",
+            "time": 23500.0,
+            "path": 3
+        },
+        {
+            "type": "tap",
+            "time": 24500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 25500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 26500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 27500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 28500.0,
+            "path": 0
+        },
+        {
+            "type": "tap",
+            "time": 29500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 30500.0,
+            "path": 2
+        },
+        {
+            "type": "tap",
+            "time": 31500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 32500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 33500.0,
+            "path": 0
+        },
+        {
+            "type": "tap",
+            "time": 34500.0,
+            "path": 2
+        },
+        {
+            "type": "tap",
+            "time": 35500.0,
+            "path": 3
+        },
+        {
+            "type": "tap",
+            "time": 36500.0,
+            "path": 2
+        },
+        {
+            "type": "tap",
+            "time": 37500.0,
+            "path": 3
+        },
+        {
+            "type": "tap",
+            "time": 38500.0,
+            "path": 0
+        },
+        {
+            "type": "tap",
+            "time": 39500.0,
+            "path": 0
+        },
+        {
+            "type": "tap",
+            "time": 40500.0,
+            "path": 3
+        },
+        {
+            "type": "tap",
+            "time": 41500.0,
+            "path": 2
+        },
+        {
+            "type": "tap",
+            "time": 42500.0,
+            "path": 2
+        },
+        {
+            "type": "tap",
+            "time": 43500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 44500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 45500.0,
+            "path": 2
+        },
+        {
+            "type": "tap",
+            "time": 46500.0,
+            "path": 3
+        },
+        {
+            "type": "tap",
+            "time": 47500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 48500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 49500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 50500.0,
+            "path": 2
+        },
+        {
+            "type": "tap",
+            "time": 51500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 52500.0,
+            "path": 0
+        },
+        {
+            "type": "tap",
+            "time": 53500.0,
+            "path": 2
+        },
+        {
+            "type": "tap",
+            "time": 54500.0,
+            "path": 3
+        },
+        {
+            "type": "tap",
+            "time": 55500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 56500.0,
+            "path": 3
+        },
+        {
+            "type": "tap",
+            "time": 57500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 58500.0,
+            "path": 1
+        },
+        {
+            "type": "tap",
+            "time": 59500.0,
+            "path": 2
+        }
+    ]
+}
