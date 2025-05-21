@@ -54,13 +54,13 @@ def write_track_file(filename: str, track_file: TrackFile):
         'notes': []
     }
     for note in track_file.notes:
-        if isinstance(note, notedata.Note):
+        if type(note) == notedata.Note:
             data['notes'].append({
                 'type': 'tap',
                 'time': note.time,
                 'path': note.path
             })
-        elif isinstance(note, notedata.Hold):
+        elif type(note) == notedata.Hold:
             data['notes'].append({
                 'type': 'hold',
                 'time': note.time,
