@@ -7,6 +7,8 @@ class TapSprite(pygame.sprite.Sprite):
 
     def __init__(self, gametime, decision_time, calc_midbottom, parent: pygame.sprite.Sprite = None):
         super().__init__()
+        # tr = TapSprite.tapimg.get_rect()
+        # self.image = pygame.transform.scale(TapSprite.tapimg, (WD_WID / 640 * tr[0], WD_WID / 640 * tr[1]))
         self.image = TapSprite.tapimg
         self.parent = parent
         self.rect = self.image.get_rect()
