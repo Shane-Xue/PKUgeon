@@ -9,7 +9,7 @@ class Scene:
     直接控制一个窗口的显示，各对象的加载、更新等等。
     场景应当有一个主循环main_loop，main_loop被调用代表进入场景，退出main_loop代表场景关闭。
     """
-    def __init__(self, main_window: pygame.Surface, clock: pygame.Clock):
+    def __init__(self, main_window: pygame.Surface, clock: pygame.time.Clock):
         self.main_window = main_window
         self.clock = clock
         pass

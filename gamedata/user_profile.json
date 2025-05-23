@@ -1,10 +1,10 @@
 {
-  "flow_speed": 0.5,
+  "flow_speed": 5,
   "latency": 0,
   "key_bindings": {
-    "path_1":"K_d",
-    "path_2":"K_f",
-    "path_3":"K_j",
-    "path_4":"K_k"
+    "path_0":"K_d",
+    "path_1":"K_f",
+    "path_2":"K_j",
+    "path_3":"K_k"
   }
 }

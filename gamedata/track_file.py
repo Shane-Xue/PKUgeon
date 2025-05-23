@@ -18,7 +18,7 @@ class TrackFile:
         self.start_time = 0 # 记录谱面开始时间，单位为ms，在此基础上加减latency
 
     def add(self, note):
-        self.notes.append(note)
+        self.notes[note.path].append(note)
 
     def remove(self, note):
         if note in self.notes:
@@ -59,19 +59,20 @@ def write_track_file(filename: str, track_file: TrackFile):
         'start_time': track_file.start_time,
         'notes': []
     }
-    for note in track_file.notes:
-        if type(note) == notedata.Note:
-            data['notes'].append({
-                'type': 'tap',
-                'time': note.time,
-                'path': note.path
-            })
-        elif type(note) == notedata.Hold:
-            data['notes'].append({
-                'type': 'hold',
-                'time': note.time,
-                'path': note.path,
-                'interval': note.interval
-            })
+    for path in track_file.notes:
+        for note in path:
+            if type(note) == notedata.Note:
+                data['notes'].append({
+                    'type': 'tap',
+                    'time': note.time,
+                    'path': note.path
+                })
+            elif type(note) == notedata.Hold:
+                data['notes'].append({
+                    'type': 'hold',
+                    'time': note.time,
+                    'path': note.path,
+                    'interval': note.interval
+                })
     with open(full_path, 'w') as f:
         json.dump(data, f, indent=4)

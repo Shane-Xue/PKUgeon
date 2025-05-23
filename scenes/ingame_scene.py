@@ -10,11 +10,14 @@ from sprites.path import PathSprite
 import event_number as en
 
 
+chart_name = 'test'
+
+
 class GameScene(Scene):
     def __init__(self, main_window: pygame.Surface, clock: pygame.Clock):
         super().__init__(main_window, clock)
 
-        self.gamemgr = game_manager.GameManager(UserProfile(), 'demo.trk')
+        self.gamemgr = game_manager.GameManager(UserProfile(), chart_name)
         self.gamemgr.prepare()
 
         self.pathsprite = [PathSprite(i) for i in range(PATHS)]
@@ -44,13 +47,13 @@ class GameScene(Scene):
         self.notesprite[data.path][id_].kill()
 
     def on_key_down(self, key):
-        if key == pygame.K_d:
+        if key == self.gamemgr.userprofile.get_key('path_0'):
             self.gamemgr.decide(0)
-        elif key == pygame.K_f:
+        elif key == self.gamemgr.userprofile.get_key('path_1'):
             self.gamemgr.decide(1)
-        elif key == pygame.K_j:
+        elif key == self.gamemgr.userprofile.get_key('path_2'):
             self.gamemgr.decide(2)
-        elif key == pygame.K_k:
+        elif key == self.gamemgr.userprofile.get_key('path_3'):
             self.gamemgr.decide(3)
 
     def main_loop(self, *args, **kwargs) -> tuple[Scene | None, list, dict]:

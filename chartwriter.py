@@ -20,10 +20,10 @@ class ChartWriter:
         """
         time = start * self.tick * 4 * (60 / self.track_file.bpm) * 1000
         if type == nd.NoteType.TAP:
-            return nd.Note(type, time, path)
+            return nd.Note(type, time, path, nd.DecisionLevel.NONE)
         elif type == nd.NoteType.HOLD:
             interval = (end - start) * self.tick * 4 * (60 / self.track_file.bpm) * 1000
-            return nd.Hold(type, time, path, interval)
+            return nd.Hold(type, time, path, nd.DecisionLevel.NONE, interval)
         else:
             raise ValueError("Invalid note type")
 
@@ -44,5 +44,6 @@ class ChartWriter:
         self.track_file.remove(note)
 
     def save(self):
-        self.track_file.notes.sort()
+        for path in self.track_file.notes:
+            path.sort()
         tf.write_track_file(self.filename, self.track_file)
