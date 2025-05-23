@@ -1,7 +1,7 @@
 import game_manager
 from gamedata.user_profile import UserProfile
 from note import notedata
-from scenes.scene import Scene
+import scenes
 import pygame
 import pygame_gui as gui
 from pygame_gui.elements.ui_label import UILabel
@@ -12,15 +12,11 @@ import event_number as en
 from gamedata.score import Score
 
 
-chart_name = 'test'
-
-
-class GameScene(Scene):
+class GameScene(scenes.Scene):
     def __init__(self, main_window: pygame.Surface, clock: pygame.Clock):
         super().__init__(main_window, clock)
 
-        self.gamemgr = game_manager.GameManager(UserProfile(), chart_name)
-        self.gamemgr.prepare()
+        self.gamemgr = game_manager.GameManager(UserProfile())
 
         self.pathsprite = [PathSprite(i) for i in range(PATHS)]
         self.pathgroup = pygame.sprite.Group(self.pathsprite)
@@ -28,21 +24,24 @@ class GameScene(Scene):
         self.notegroups = [pygame.sprite.Group() for _ in range(PATHS)]
         self.calc_midbottom = linear_calc_midbottom(self.gamemgr.userprofile.flow_speed, DECISION_POS, INIT_POS)
 
-        # self.side_board = pygame.Surface((WD_WID - 640, WD_HEI))
         self.side_board_guimgr = gui.UIManager((WD_WID, WD_HEI), theme_path="./src/theme/ingame.json")
-        self.badge_label = UILabel(pygame.Rect((740, 100), (400, 100)),
+        self.side_board = gui.core.UIContainer((WD_WID / 2, 0, WD_WID / 2, WD_HEI),
+                                               manager=self.side_board_guimgr)
+        self.badge_label = UILabel(pygame.Rect((100, 100), (WD_WID / 2 - 100, 100)),
                                    "AP FC+ FC",
-                                   manager=self.side_board_guimgr,)
-        self.score_label = UILabel(pygame.Rect((740, 250), (400, 100)),
+                                   manager=self.side_board_guimgr,
+                                   container=self.side_board)
+        self.score_label = UILabel(pygame.Rect((100, 250), (WD_WID / 2 - 100, 100)),
                                    "SCORE:",
-                                   manager=self.side_board_guimgr, )
+                                   manager=self.side_board_guimgr,
+                                   container=self.side_board)
         self.score_label.set_text_scale(100)
-        self.combo_label = UILabel(pygame.Rect((740, 400), (400, 100)),
+        self.combo_label = UILabel(pygame.Rect((100, 400), (WD_WID / 2 - 100, 100)),
                                    "COMBO:",
-                                   manager=self.side_board_guimgr, )
+                                   manager=self.side_board_guimgr,
+                                   container=self.side_board)
         self.score = Score()
         self.update_side_board()
-        # pygame.image.save(self.side_board, "test.png")
 
     def update_side_board(self):
         # self.side_board.fill((255, 255, 255))
@@ -104,7 +103,9 @@ class GameScene(Scene):
         elif key == self.gamemgr.userprofile.get_key('path_3'):
             self.gamemgr.decide(3)
 
-    def main_loop(self, *args, **kwargs) -> tuple[Scene | None, list, dict]:
+    def main_loop(self, *args, **kwargs) -> tuple[scenes.Scene | None, list, dict]:
+        self.gamemgr.prepare(kwargs['trackfile_name'])
+
         going = True
 
         while going:
@@ -120,7 +121,8 @@ class GameScene(Scene):
                 elif event.type == pygame.KEYDOWN:
                     self.on_key_down(event.key)
                 elif event.type == en.GAME_OVER:
-                    return None, [], {}
+                    return scenes.GameOverScene(self.main_window, self.clock), [], {"score": self.score,
+                                                                             "retry_which": self.gamemgr.trackfile_name}
             self.gamemgr.update(self.clock.get_time())
             self.side_board_guimgr.update(self.clock.get_time() / 1000)
             self.pathgroup.update(self.gamemgr.gametime)

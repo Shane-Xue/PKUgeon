@@ -25,25 +25,26 @@ class GameManager:
         STARTED = auto()
         STOPPED = auto()
 
-    def __init__(self, userprofile: gd.user_profile.UserProfile, track_file_name: str):
+    def __init__(self, userprofile: gd.user_profile.UserProfile):
         self.userprofile = userprofile
-        self.track_file_name = track_file_name
         self.gametime = -config.GAP_TIME
         self.musictime = userprofile.latency - config.GAP_TIME
+        self.trackfile_name = None
         self.bpm = None
         self.duration_ms = None
         self.status = GameManager.Status.INITIALIZED
         self.notemgr = None
 
-    def prepare(self):
+    def prepare(self, trackfile_name: str):
         """
         在game_start前调用，为开始游戏做好准备：
         1. 读取track file
         2. 读取music file
         """
         self.status = GameManager.Status.READY
+        self.trackfile_name = trackfile_name
         # 读取track file
-        trackfile = gd.track_file.read_track_file(self.track_file_name)
+        trackfile = gd.track_file.read_track_file(trackfile_name)
         self.bpm = trackfile.bpm
         self.duration_ms = trackfile.duration_ms
         self.notemgr = NoteManager(trackfile.notes, self.gametime, self.userprofile.pre_creation_latency())

@@ -1,13 +1,8 @@
 import pygame
 import json
-import game_manager
-from gamedata.user_profile import UserProfile
-import event_number as en
-from scenes.main_scene import MainScene
-from sprites.path import PathSprite
-from sprites.notesprite.tap import TapSprite, linear_calc_midbottom
+import scenes
 from config import *
-from note import notedata
+from gamedata.score import Score
 
 
 def main():
@@ -15,7 +10,7 @@ def main():
     screen = pygame.display.set_mode((WD_WID, WD_HEI))
     clock = pygame.time.Clock()
 
-    current_scn = MainScene(screen, clock)
+    current_scn = scenes.MainScene(screen, clock)
     args = []
     kwargs = {}
     while current_scn is not None:

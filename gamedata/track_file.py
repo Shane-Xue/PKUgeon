@@ -34,7 +34,7 @@ def read_track_file(filename: str) -> TrackFile:
         data = json.load(f)
         ret.duration_ms = float(data['duration_ms'])
         ret.bpm = int(data['bpm'])
-        ret.start_time = float(data['start_time'])
+        #ret.start_time = float(data['start_time'])
         for note in data['notes']:
             if note['type'] == 'tap':
                 ret.notes[int(note['path'])].append(notedata.Note(notedata.NoteType.TAP,

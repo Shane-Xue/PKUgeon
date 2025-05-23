@@ -1,11 +1,10 @@
 import pygame
 import pygame_gui as gui
-from scenes.scene import Scene
-from scenes.ingame_scene import GameScene
+import scenes
 from config import *
 
 
-class MainScene(Scene):
+class MainScene(scenes.Scene):
     def __init__(self, main_window: pygame.Surface, clock: pygame.Clock):
         super().__init__(main_window, clock)
         self.uimgr = gui.UIManager((WD_WID, WD_HEI))
@@ -18,17 +17,18 @@ class MainScene(Scene):
                                                         "chart maker", manager=self.uimgr)
         self.chart_maker_button.disable()
 
-    def main_loop(self, *args, **kwargs) -> tuple[Scene | None, list, dict]:
+    def main_loop(self, *args, **kwargs) -> tuple[scenes.Scene | None, list, dict]:
         going = True
 
         while going:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    going = False
-                if event.type == gui.UI_BUTTON_PRESSED:
+                    return None, [], {}
+                elif event.type == gui.UI_BUTTON_PRESSED:
                     match event.ui_element:
                         case self.start_button:
-                            return GameScene(self.main_window, self.clock), [], {}
+                            return (scenes.GameScene(self.main_window, self.clock), [],
+                                    {"trackfile_name": "demo"})
                         case self.exit_button:
                             return None, [], {}
                         case self.chart_maker_button:
