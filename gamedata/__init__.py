@@ -5,3 +5,4 @@ gamedata
 
 from . import user_profile
 from . import track_file
+from . import score

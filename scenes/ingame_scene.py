@@ -4,10 +4,12 @@ from note import notedata
 from scenes.scene import Scene
 import pygame
 import pygame_gui as gui
+from pygame_gui.elements.ui_label import UILabel
 from config import *
 from sprites.notesprite.tap import TapSprite, linear_calc_midbottom
 from sprites.path import PathSprite
 import event_number as en
+from gamedata.score import Score
 
 
 class GameScene(Scene):
@@ -23,6 +25,31 @@ class GameScene(Scene):
         self.notegroups = [pygame.sprite.Group() for _ in range(PATHS)]
         self.calc_midbottom = linear_calc_midbottom(self.gamemgr.userprofile.flow_speed, DECISION_POS, INIT_POS)
 
+        # self.side_board = pygame.Surface((WD_WID - 640, WD_HEI))
+        self.side_board_guimgr = gui.UIManager((WD_WID, WD_HEI), theme_path="./src/theme/ingame.json")
+        self.badge_label = UILabel(pygame.Rect((740, 100), (400, 100)),
+                                   "AP FC+ FC",
+                                   manager=self.side_board_guimgr,)
+        self.score_label = UILabel(pygame.Rect((740, 250), (400, 100)),
+                                   "SCORE:",
+                                   manager=self.side_board_guimgr, )
+        self.score_label.set_text_scale(100)
+        self.combo_label = UILabel(pygame.Rect((740, 400), (400, 100)),
+                                   "COMBO:",
+                                   manager=self.side_board_guimgr, )
+        self.score = Score()
+        self.update_side_board()
+        # pygame.image.save(self.side_board, "test.png")
+
+    def update_side_board(self):
+        # self.side_board.fill((255, 255, 255))
+        self.badge_label.set_text(f"{'AP' if self.score.is_ap else '  '} {'FC+' if self.score.is_fcplus else '   '}" 
+                                  f"{'FC' if self.score.is_fc else '  '}")
+        self.score_label.set_text(f"SCORE: {self.score.score:>8}")
+        self.combo_label.set_text(f"COMBO: {self.score.combo:>5} (MAX: {self.score.max_combo:>5})")
+        # self.side_board_guimgr.draw_ui(self.side_board)
+        # self.main_window.blit(self.side_board, (640, 0))
+
     def on_create_note(self, data: notedata.Note, id_):
         if data.type == notedata.NoteType.TAP:
             ntap = TapSprite(self.gamemgr.gametime, data.time, self.calc_midbottom, self.pathsprite[data.path])
@@ -35,13 +62,34 @@ class GameScene(Scene):
         match data.decision:
             case notedata.DecisionLevel.MISS:
                 print("MISS")
+                self.score.misses += 1
+                self.score.combo = 0
+                self.score.is_ap = False
+                self.score.is_fcplus = False
+                self.score.is_fc = False
             case notedata.DecisionLevel.PERFECT:
                 print("PERFECT")
+                self.score.perfects += 1
+                self.score.combo += 1
+                self.score.max_combo = max(self.score.combo, self.score.max_combo)
+                self.score.score += 10
             case notedata.DecisionLevel.GREAT:
                 print("GREAT")
+                self.score.greats += 1
+                self.score.combo += 1
+                self.score.max_combo = max(self.score.combo, self.score.max_combo)
+                self.score.is_ap = False
+                self.score.score += 6
             case notedata.DecisionLevel.GOOD:
                 print("GOOD")
+                self.score.goods += 1
+                self.score.combo += 1
+                self.score.max_combo = max(self.score.combo, self.score.max_combo)
+                self.score.is_ap = False
+                self.score.is_fcplus = False
+                self.score.score += 3
         self.notesprite[data.path][id_].kill()
+        self.update_side_board()
 
     def on_key_down(self, key):
         if key == pygame.K_d:
@@ -59,6 +107,7 @@ class GameScene(Scene):
         while going:
             self.main_window.fill((255, 255, 255))
             for event in pygame.event.get():
+                self.side_board_guimgr.process_events(event)
                 if event.type == pygame.QUIT:
                     return None, [], {}
                 elif event.type == en.CREATE_NOTE:
@@ -70,11 +119,12 @@ class GameScene(Scene):
                 elif event.type == en.GAME_OVER:
                     return None, [], {}
             self.gamemgr.update(self.clock.get_time())
+            self.side_board_guimgr.update(self.clock.get_time() / 1000)
             self.pathgroup.update(self.gamemgr.gametime)
+            self.side_board_guimgr.draw_ui(self.main_window)
             self.pathgroup.draw(self.main_window)
             for notegroup in self.notegroups:
                 notegroup.update(self.gamemgr.gametime)
                 notegroup.draw(self.main_window)
             pygame.display.flip()
             self.clock.tick(FPS)
-

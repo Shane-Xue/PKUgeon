@@ -12,5 +12,5 @@ class PathSprite(pygame.sprite.Sprite):
         # self.image = pygame.transform.scale(PathSprite.pathimg, (WD_WID / 640 * tr[0], WD_WID / 640 * tr[1]))
         self.image = PathSprite.pathimg
         self.rect = self.image.get_rect()
-        self.rect.midtop = ((pathid * 2 + 1) / (2 * PATHS) * WD_WID, 0)
+        self.rect.midtop = ((pathid * 2 + 1) / (2 * PATHS) * 640, 0)
 
