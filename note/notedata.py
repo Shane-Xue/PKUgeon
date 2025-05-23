@@ -1,3 +1,9 @@
+"""
+定义了各类型的note
+注意这些只是note的数据表示，并不是在屏幕上移动的真正的note对象。
+note对象由NoteManager创建和销毁
+"""
+
 from dataclasses import dataclass
 from enum import Enum, auto
 
@@ -5,6 +11,14 @@ from enum import Enum, auto
 class NoteType(Enum):
     TAP = auto()
     HOLD = auto()
+
+
+class DecisionLevel(Enum):
+    NONE = 0
+    MISS = auto()
+    GOOD = auto()
+    GREAT = auto()
+    PERFECT = auto()
 
 
 @dataclass
@@ -17,9 +31,10 @@ class Note:
     type: NoteType
     time: float
     path: int
+    decision: DecisionLevel
 
     def __lt__(self, other):
-        return self.time < other.time or (self.time == other.time and self.path < other.path)
+        return self.path < other.path or (self.path == other.path and self.time < other.time)
 
 
 @dataclass
