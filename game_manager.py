@@ -68,4 +68,4 @@ class GameManager:
         # todo
 
     def decide(self, path: int):
-        self.notemgr.decide(path)
+        self.notemgr.down(path)

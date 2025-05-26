@@ -14,7 +14,7 @@ GAP_TIME = 5  # 进入游戏后的间隙时间
 FPS = 60
 
 DECISION_POS = 440  # 判定线位置
-INIT_POS = 30
+INIT_POS = 30  # note最早出现的位置
 
 
 PERFECT_INTERVAL = 30   # ms
