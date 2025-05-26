@@ -107,7 +107,6 @@ class GameScene(scenes.Scene):
         self.gamemgr.prepare(kwargs['trackfile_name'])
 
         going = True
-
         while going:
             self.main_window.fill((255, 255, 255))
             for event in pygame.event.get():
@@ -123,7 +122,6 @@ class GameScene(scenes.Scene):
                 elif event.type == en.GAME_OVER:
                     return scenes.GameOverScene(self.main_window, self.clock), [], {"score": self.score,
                                                                              "retry_which": self.gamemgr.trackfile_name}
-            self.gamemgr.update(self.clock.get_time())
             self.side_board_guimgr.update(self.clock.get_time() / 1000)
             self.pathgroup.update(self.gamemgr.gametime)
             self.side_board_guimgr.draw_ui(self.main_window)
