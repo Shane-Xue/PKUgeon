@@ -1,8 +1,11 @@
+from pygame_gui.elements import UIButton
+
 import game_manager
 from gamedata.user_profile import UserProfile
 from note import notedata
 import scenes
 import pygame
+from pygame import Rect
 import pygame_gui as gui
 from pygame_gui.elements.ui_label import UILabel
 from config import *
@@ -44,10 +47,19 @@ class GameScene(scenes.Scene):
         self.score = Score()
         self.update_side_board()
 
-        self.pause_guimgr = gui.UIManager((WD_WID, WD_HEI), theme_path="./src/theme/ingame.json")
-        self.pause_menu = gui.core.UIContainer((WD_WID * 0.2, WD_HEI * 0.2, WD_WID * 0.6, WD_HEI * 0.6),
+        self.pause_guimgr = gui.UIManager((WD_WID, WD_HEI), theme_path="./src/theme/pause_menu.json")
+        self.pause_menu = gui.core.UIContainer((WD_WID * 0.1, WD_HEI * 0.2, WD_WID * 0.3, WD_HEI * 0.6),
                                                manager=self.pause_guimgr)
-        self.pause_menu.visible = False
+        self.pause_menu.hide()
+        ts = self.pause_menu.rect.size
+        self.pause_label = UILabel(Rect(0, 0, ts[0], 50), "PAUSED",
+                                   manager=self.pause_guimgr, container=self.pause_menu)
+        self.resume_button = UIButton(Rect(ts[0] * 0.2, ts[1] * 0.2, ts[0] * 0.6, 50), "Resume",
+                                      manager=self.pause_guimgr, container=self.pause_menu)
+        self.retry_button = UIButton(Rect(ts[0] * 0.2, ts[1] * 0.4, ts[0] * 0.6, 50), "Retry",
+                                     manager=self.pause_guimgr, container=self.pause_menu)
+        self.exit_button = UIButton(Rect(ts[0] * 0.2, ts[1] * 0.6, ts[0] * 0.6, 50), "Exit",
+                                    manager=self.pause_guimgr, container=self.pause_menu)
 
     def update_side_board(self):
         # self.side_board.fill((255, 255, 255))
@@ -109,7 +121,15 @@ class GameScene(scenes.Scene):
         elif key == self.gamemgr.userprofile.get_key('path_3'):
             if not self.paused: self.gamemgr.decide(3)
         elif key == pygame.K_ESCAPE:
-            self.paused = not self.paused
+            self.switch_pause_state()
+
+    def switch_pause_state(self):
+        if self.paused:
+            self.paused = False
+            self.pause_menu.hide()
+        else:
+            self.paused = True
+            self.pause_menu.show()
 
     def main_loop(self, *args, **kwargs) -> tuple[scenes.Scene | None, list, dict]:
         self.gamemgr.prepare(kwargs['trackfile_name'])
@@ -120,6 +140,7 @@ class GameScene(scenes.Scene):
             self.main_window.fill((255, 255, 255))
             for event in pygame.event.get():
                 self.side_board_guimgr.process_events(event)
+                self.pause_guimgr.process_events(event)
                 if event.type == pygame.QUIT:
                     return None, [], {}
                 elif event.type == en.CREATE_NOTE:
@@ -131,14 +152,23 @@ class GameScene(scenes.Scene):
                 elif event.type == en.GAME_OVER:
                     return (scenes.GameOverScene(self.main_window, self.clock), [],
                             {"score": self.score, "retry_which": self.gamemgr.trackfile_name})
+                elif event.type == gui.UI_BUTTON_PRESSED:
+                    if event.ui_element == self.resume_button:
+                        self.switch_pause_state()
+                    elif event.ui_element == self.retry_button:
+                        return scenes.GameScene(self.main_window, self.clock), args, kwargs
+                    elif event.ui_element == self.exit_button:
+                        return scenes.MainScene(self.main_window, self.clock), [], {}
             if not self.paused:
                 self.gamemgr.update(self.clock.get_time())
             self.side_board_guimgr.update(self.clock.get_time() / 1000)
+            self.pause_guimgr.update(self.clock.get_time() / 1000)
             self.pathgroup.update(self.gamemgr.gametime)
             self.side_board_guimgr.draw_ui(self.main_window)
             self.pathgroup.draw(self.main_window)
             for notegroup in self.notegroups:
                 notegroup.update(self.gamemgr.gametime)
                 notegroup.draw(self.main_window)
+            self.pause_guimgr.draw_ui(self.main_window)
             pygame.display.flip()
             self.clock.tick(FPS)
