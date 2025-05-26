@@ -15,8 +15,7 @@ class UserProfile:
     :ivar flow_speed: 流速，note从顶端落到底端需要的时间为5s/flow_speed
     """
 
-
-    def pre_creation_latency(self):
+    def pre_creation_offset(self):
         return 5000 / self.flow_speed
     
     def __init__(self):

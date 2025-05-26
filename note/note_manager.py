@@ -40,7 +40,7 @@ class NoteManager:
                         one: notedata.Hold = one
                         if one.tail_decision != notedata.DecisionLevel.NONE:
                             self.disposed[p] += 1
-                        elif one.time + one.interval <= self.gametime - GOOD_INTERVAL:
+                        elif one.time + one.interval <= self.gametime:
                             if (one.decision == notedata.DecisionLevel.NONE or
                                     one.decision == notedata.DecisionLevel.MISS):
                                 one.decision = notedata.DecisionLevel.MISS
@@ -66,6 +66,7 @@ class NoteManager:
         path轨道被按下，判定tap和hold的头判
         """
         i = self.disposed[path]
+        if i >= len(self.notes[path]): return
         while self.notes[path][i].decision != notedata.DecisionLevel.NONE:
             i += 1
             self.disposed[path] += 1
@@ -88,11 +89,12 @@ class NoteManager:
         path轨道被松开，判定hold的尾判
         """
         i = self.disposed[path]
+        if i >= len(self.notes[path]): return
         one: notedata.Hold = self.notes[path][i]
         if (one.type == notedata.NoteType.HOLD and one.decision != notedata.DecisionLevel.NONE
                 and one.tail_decision == notedata.DecisionLevel.NONE):
             delta = one.time + one.interval
-            if abs(delta) < GOOD_INTERVAL:
+            if one.time + one.interval - self.gametime < GOOD_INTERVAL:
                 one.tail_decision = notedata.DecisionLevel.PERFECT
             else:
                 one.tail_decision = notedata.DecisionLevel.MISS
