@@ -30,10 +30,9 @@ def random_generate():
                                  'time': t,
                                  })
         t += 1000 / 8
-    with open('gamedata/resources/demo/demo', 'w') as file:
+    with open('demo.trk', 'w') as file:
         json.dump(trkdata, file)
 
 
 if __name__ == '__main__':
-    random_generate()
     main()

@@ -17,6 +17,7 @@ class GameScene(scenes.Scene):
         super().__init__(main_window, clock)
 
         self.gamemgr = game_manager.GameManager(UserProfile())
+        self.paused = False
 
         self.pathsprite = [PathSprite(i) for i in range(PATHS)]
         self.pathgroup = pygame.sprite.Group(self.pathsprite)
@@ -43,9 +44,14 @@ class GameScene(scenes.Scene):
         self.score = Score()
         self.update_side_board()
 
+        self.pause_guimgr = gui.UIManager((WD_WID, WD_HEI), theme_path="./src/theme/ingame.json")
+        self.pause_menu = gui.core.UIContainer((WD_WID * 0.2, WD_HEI * 0.2, WD_WID * 0.6, WD_HEI * 0.6),
+                                               manager=self.pause_guimgr)
+        self.pause_menu.visible = False
+
     def update_side_board(self):
         # self.side_board.fill((255, 255, 255))
-        self.badge_label.set_text(f"{'AP' if self.score.is_ap else '  '} {'FC+' if self.score.is_fcplus else '   '}" 
+        self.badge_label.set_text(f"{'AP' if self.score.is_ap else '  '} {'FC+' if self.score.is_fcplus else '   '}"
                                   f"{'FC' if self.score.is_fc else '  '}")
         self.score_label.set_text(f"SCORE: {self.score.score:>8}")
         self.combo_label.set_text(f"COMBO: {self.score.combo:>5} (MAX: {self.score.max_combo:>5})")
@@ -95,18 +101,21 @@ class GameScene(scenes.Scene):
 
     def on_key_down(self, key):
         if key == self.gamemgr.userprofile.get_key('path_0'):
-            self.gamemgr.decide(0)
+            if not self.paused: self.gamemgr.decide(0)
         elif key == self.gamemgr.userprofile.get_key('path_1'):
-            self.gamemgr.decide(1)
+            if not self.paused: self.gamemgr.decide(1)
         elif key == self.gamemgr.userprofile.get_key('path_2'):
-            self.gamemgr.decide(2)
+            if not self.paused: self.gamemgr.decide(2)
         elif key == self.gamemgr.userprofile.get_key('path_3'):
-            self.gamemgr.decide(3)
+            if not self.paused: self.gamemgr.decide(3)
+        elif key == pygame.K_ESCAPE:
+            self.paused = not self.paused
 
     def main_loop(self, *args, **kwargs) -> tuple[scenes.Scene | None, list, dict]:
         self.gamemgr.prepare(kwargs['trackfile_name'])
 
         going = True
+
         while going:
             self.main_window.fill((255, 255, 255))
             for event in pygame.event.get():
@@ -120,8 +129,10 @@ class GameScene(scenes.Scene):
                 elif event.type == pygame.KEYDOWN:
                     self.on_key_down(event.key)
                 elif event.type == en.GAME_OVER:
-                    return scenes.GameOverScene(self.main_window, self.clock), [], {"score": self.score,
-                                                                             "retry_which": self.gamemgr.trackfile_name}
+                    return (scenes.GameOverScene(self.main_window, self.clock), [],
+                            {"score": self.score, "retry_which": self.gamemgr.trackfile_name})
+            if not self.paused:
+                self.gamemgr.update(self.clock.get_time())
             self.side_board_guimgr.update(self.clock.get_time() / 1000)
             self.pathgroup.update(self.gamemgr.gametime)
             self.side_board_guimgr.draw_ui(self.main_window)
