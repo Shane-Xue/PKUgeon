@@ -35,5 +35,5 @@ def random_generate():
 
 
 if __name__ == '__main__':
-    random_generate()
+    # random_generate()
     main()

@@ -28,7 +28,7 @@ class MainScene(scenes.Scene):
                     match event.ui_element:
                         case self.start_button:
                             return (scenes.GameScene(self.main_window, self.clock), [],
-                                    {"trackfile_name": "demo"})
+                                    {"trackfile_name": "test"})
                         case self.exit_button:
                             return None, [], {}
                         case self.chart_maker_button:
