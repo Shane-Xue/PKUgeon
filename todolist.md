@@ -3,7 +3,7 @@
 - 暂停界面 @zzj 已完成
 
 选曲界面\
-HoldNote @zzj\
+HoldNote @zzj\ 已完成
 音乐播放器\
 音效\
 按键效果\

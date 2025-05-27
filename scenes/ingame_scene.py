@@ -32,7 +32,8 @@ class GameScene(scenes.Scene):
                                                                DECISION_POS, TOP_POS)
         self.holdline_calc_midbottom = HoldLineSprite.gen_default_fn(self.gamemgr.userprofile.flow_speed,
                                                                      DECISION_POS, TOP_POS)
-
+        self.holdline_calc_length = HoldLineSprite.gen_calc_length_fn(self.gamemgr.userprofile.flow_speed,
+                                                                      DECISION_POS, TOP_POS)
         self.side_board_guimgr = gui.UIManager((WD_WID, WD_HEI), theme_path="./src/theme/ingame.json")
         self.side_board = gui.core.UIContainer((WD_WID / 2, 0, WD_WID / 2, WD_HEI),
                                                manager=self.side_board_guimgr)
@@ -82,8 +83,9 @@ class GameScene(scenes.Scene):
             self.notegroups[data.path].add(ntap)
         elif data.type == notedata.NoteType.HOLD:
             nt1 = TapNoteSprite(data.time, self.tap_calc_midbottom, self.pathsprite[data.path])
-            nt2 = TapNoteSprite(data.time, self.tap_calc_midbottom, self.pathsprite[data.path])
-            nl = HoldLineSprite(data.time, self.holdline_calc_midbottom, self.pathsprite[data.path])
+            nt2 = TapNoteSprite(data.time + data.interval, self.tap_calc_midbottom, self.pathsprite[data.path])
+            nl = HoldLineSprite(data.time, self.holdline_calc_length(data.interval),
+                                self.holdline_calc_midbottom, self.pathsprite[data.path])
             self.notesprite[data.path][id_] = nt1, nt2, nl
             self.notegroups[data.path].add(nt1, nt2, nl)
 
@@ -91,27 +93,23 @@ class GameScene(scenes.Scene):
         if data.type == notedata.NoteType.TAP:
             match data.decision:
                 case notedata.DecisionLevel.MISS:
-                    print("MISS")
                     self.score.misses += 1
                     self.score.combo = 0
                     self.score.is_ap = False
                     self.score.is_fcplus = False
                     self.score.is_fc = False
                 case notedata.DecisionLevel.PERFECT:
-                    print("PERFECT")
                     self.score.perfects += 1
                     self.score.combo += 1
                     self.score.max_combo = max(self.score.combo, self.score.max_combo)
                     self.score.score += 10
                 case notedata.DecisionLevel.GREAT:
-                    print("GREAT")
                     self.score.greats += 1
                     self.score.combo += 1
                     self.score.max_combo = max(self.score.combo, self.score.max_combo)
                     self.score.is_ap = False
                     self.score.score += 6
                 case notedata.DecisionLevel.GOOD:
-                    print("GOOD")
                     self.score.goods += 1
                     self.score.combo += 1
                     self.score.max_combo = max(self.score.combo, self.score.max_combo)
@@ -121,13 +119,15 @@ class GameScene(scenes.Scene):
             self.notesprite[data.path][id_].kill()
         elif data.type == notedata.NoteType.HOLD:
             decision = data.decision
+            print(decision, end=' ')
+            print(data.tail_decision, end=' ')
             if data.tail_decision == notedata.DecisionLevel.MISS:
                 if decision == notedata.DecisionLevel.GREAT: decision = notedata.DecisionLevel.GOOD
                 elif decision == notedata.DecisionLevel.PERFECT: decision = notedata.DecisionLevel.GREAT
             else:
                 if decision == notedata.DecisionLevel.MISS: decision = notedata.DecisionLevel.GOOD
                 elif decision == notedata.DecisionLevel.GOOD: decision = notedata.DecisionLevel.GREAT
-            match data.decision:
+            match decision:
                 case notedata.DecisionLevel.MISS:
                     print("MISS")
                     self.score.misses += 1

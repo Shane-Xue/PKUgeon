@@ -16,7 +16,7 @@ FPS = 60
 DECISION_POS = 440  # 判定线位置
 TOP_POS = 30  # note最早出现的位置
 
-HOLD_LINE_WIDTH = 5
+HOLD_LINE_WIDTH = 10
 
 
 PERFECT_INTERVAL = 30   # ms

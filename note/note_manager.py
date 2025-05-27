@@ -66,7 +66,7 @@ class NoteManager:
         path轨道被按下，判定tap和hold的头判
         """
         i = self.disposed[path]
-        if i >= len(self.notes[path]): return
+        if i >= self.created[path]: return
         while self.notes[path][i].decision != notedata.DecisionLevel.NONE:
             i += 1
             self.disposed[path] += 1
@@ -89,7 +89,7 @@ class NoteManager:
         path轨道被松开，判定hold的尾判
         """
         i = self.disposed[path]
-        if i >= len(self.notes[path]): return
+        if i >= self.created[path]: return
         one: notedata.Hold = self.notes[path][i]
         if (one.type == notedata.NoteType.HOLD and one.decision != notedata.DecisionLevel.NONE
                 and one.tail_decision == notedata.DecisionLevel.NONE):
@@ -98,3 +98,4 @@ class NoteManager:
                 one.tail_decision = notedata.DecisionLevel.PERFECT
             else:
                 one.tail_decision = notedata.DecisionLevel.MISS
+            event.post(event.Event(en.DISPOSE_NOTE, {"path": path, "id": i, "notedata": self.notes[path][i]}))
