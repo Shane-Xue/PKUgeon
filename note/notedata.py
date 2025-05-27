@@ -20,6 +20,19 @@ class DecisionLevel(Enum):
     GREAT = auto()
     PERFECT = auto()
 
+    def __str__(self):
+        match self:
+            case self.NONE:
+                return ""
+            case self.MISS:
+                return "Miss"
+            case self.GOOD:
+                return "Good"
+            case self.GREAT:
+                return "Great"
+            case self.PERFECT:
+                return "Perfect"
+
 
 @dataclass
 class Note:
@@ -32,12 +45,6 @@ class Note:
     time: float
     path: int
     decision: DecisionLevel
-
-    def should_create(self):
-        pass
-
-    def should_dispose(self):
-        pass
 
     def __lt__(self, other):
         return self.path < other.path or (self.path == other.path and self.time < other.time)

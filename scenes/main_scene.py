@@ -16,6 +16,8 @@ class MainScene(scenes.Scene):
         self.chart_maker_button = gui.elements.UIButton(pygame.Rect((100, 300), (200, 100)),
                                                         "chart maker", manager=self.uimgr)
         self.chart_maker_button.disable()
+        self.title_label = gui.elements.UILabel(pygame.Rect(WD_WID * 0.3, WD_HEI * 0.2, WD_WID * 0.4, 50),
+                                                "PKUgeon",  manager=self.uimgr)
 
     def main_loop(self, *args, **kwargs) -> tuple[scenes.Scene | None, list, dict]:
         going = True

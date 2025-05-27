@@ -65,7 +65,7 @@ class NoteManager:
         """
         i = self.disposed[path]
         if i >= self.created[path]: return
-        while self.notes[path][i].decision != notedata.DecisionLevel.NONE:
+        while self.notes[path][i].decision != notedata.DecisionLevel.NONE and i < self.created[path] - 1:
             i += 1
         delta = self.notes[path][i].time - self.gametime
         if delta > MISS_INTERVAL:

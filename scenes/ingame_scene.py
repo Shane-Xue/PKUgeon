@@ -15,6 +15,7 @@ from sprites.notesprite.tap import TapNoteSprite, HoldStartNoteSprite
 from sprites.path import PathSprite
 import event_number as en
 from gamedata.score import Score
+from sprites.tap_effect import ColoredTextSprite
 
 
 class GameScene(scenes.Scene):
@@ -28,6 +29,7 @@ class GameScene(scenes.Scene):
         self.pathgroup = pygame.sprite.Group(self.pathsprite)
         self.notesprite: list[dict[int, AbstractNoteSprite | tuple]] = [{} for i in range(PATHS)]
         self.notegroups = [pygame.sprite.Group() for _ in range(PATHS)]
+        self.decision_label_group = pygame.sprite.Group()
         self.tap_calc_midbottom = TapNoteSprite.gen_default_fn(self.gamemgr.userprofile.flow_speed,
                                                                DECISION_POS, TOP_POS)
         self.holdline_calc_midbottom = HoldLineSprite.gen_default_fn(self.gamemgr.userprofile.flow_speed,
@@ -66,6 +68,9 @@ class GameScene(scenes.Scene):
                                      manager=self.pause_guimgr, container=self.pause_menu)
         self.exit_button = UIButton(Rect(ts[0] * 0.2, ts[1] * 0.6, ts[0] * 0.6, 50), "Exit",
                                     manager=self.pause_guimgr, container=self.pause_menu)
+
+        self.decision_label: list[ColoredTextSprite] = [None for _ in range(PATHS)]
+
 
     def update_side_board(self):
         # self.side_board.fill((255, 255, 255))
@@ -126,6 +131,7 @@ class GameScene(scenes.Scene):
             else:
                 if decision == notedata.DecisionLevel.MISS: decision = notedata.DecisionLevel.GOOD
                 elif decision == notedata.DecisionLevel.GOOD: decision = notedata.DecisionLevel.GREAT
+            data.decision = decision
             match decision:
                 case notedata.DecisionLevel.MISS:
                     print("MISS")
@@ -158,6 +164,7 @@ class GameScene(scenes.Scene):
             ss = self.notesprite[data.path][id_]
             for s in ss: s.kill()
         self.update_side_board()
+        self.show_tap_effect(data.path, data.decision)
 
     def on_key_down(self, key):
         if key == self.gamemgr.userprofile.get_key('path_0'):
@@ -189,6 +196,26 @@ class GameScene(scenes.Scene):
             self.paused = True
             self.pause_menu.show()
 
+    def show_tap_effect(self, path: int, decision_level: notedata.DecisionLevel):
+        if self.decision_label[path] is not None:
+            self.decision_label[path].kill()
+        center = self.pathsprite[path].rect.midbottom
+        if decision_level == notedata.DecisionLevel.PERFECT:
+            self.decision_label[path] = ColoredTextSprite.perfect(center)
+        elif decision_level == notedata.DecisionLevel.GREAT:
+            self.decision_label[path] = ColoredTextSprite.great(center)
+        elif decision_level == notedata.DecisionLevel.GOOD:
+            self.decision_label[path] = ColoredTextSprite.good(center)
+        elif decision_level == notedata.DecisionLevel.MISS:
+            self.decision_label[path] = ColoredTextSprite.miss(center)
+        self.decision_label_group.add(self.decision_label[path])
+        pygame.time.set_timer(pygame.event.Event(en.HIDE_TAP_EFFECT + path), 500, loops=1)
+
+    def hide_tap_effect(self, path: int):
+        if self.decision_label[path] is not None:
+            self.decision_label[path].kill()
+            self.decision_label[path] = None
+
     def main_loop(self, *args, **kwargs) -> tuple[scenes.Scene | None, list, dict]:
         self.gamemgr.prepare(kwargs['trackfile_name'])
 
@@ -219,6 +246,8 @@ class GameScene(scenes.Scene):
                         return scenes.GameScene(self.main_window, self.clock), args, kwargs
                     elif event.ui_element == self.exit_button:
                         return scenes.MainScene(self.main_window, self.clock), [], {}
+                elif en.HIDE_TAP_EFFECT <= event.type < en.HIDE_TAP_EFFECT + PATHS:
+                    self.hide_tap_effect(event.type - en.HIDE_TAP_EFFECT)
             if not self.paused:
                 self.gamemgr.update(self.clock.get_time())
             self.side_board_guimgr.update(self.clock.get_time() / 1000)
@@ -229,7 +258,7 @@ class GameScene(scenes.Scene):
             for notegroup in self.notegroups:
                 notegroup.update(self.gamemgr.gametime)
                 notegroup.draw(self.main_window)
-            # self.main_window.fill((255, 255, 255), Rect(0, DECISION_POS, WD_WID / 2, WD_HEI - DECISION_POS))
+            self.decision_label_group.draw(self.main_window)
             self.pause_guimgr.draw_ui(self.main_window)
             pygame.display.flip()
             self.clock.tick(FPS)
