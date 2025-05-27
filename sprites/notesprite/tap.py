@@ -19,3 +19,13 @@ class TapNoteSprite(AbstractNoteSprite):
         return f
 
 
+class HoldStartNoteSprite(TapNoteSprite):
+    def __init__(self, decision_time, bottom_pos, fn_calc_midbottom, parent: pygame.sprite.Sprite = None):
+        super().__init__(decision_time, fn_calc_midbottom, parent)
+        self.bottom_pos = bottom_pos
+
+    def update(self, gametime):
+        if gametime < self.decision_time:
+            super().update(gametime)
+        else:
+            self.rect.midbottom = (self.parent.rect.midbottom[0], self.bottom_pos)

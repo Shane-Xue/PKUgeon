@@ -4,11 +4,23 @@ from sprites.abstract import AbstractNoteSprite
 
 
 class HoldLineSprite(AbstractNoteSprite):
-    def __init__(self, decision_time, length, fn_calc_midbottom, parent: pygame.sprite.Sprite = None):
-        super().__init__(decision_time, fn_calc_midbottom, parent)
+    def __init__(self, start_note: pygame.sprite.Sprite, end_note: pygame.sprite.Sprite,
+                 decision_time, length):
+        super().__init__(decision_time, None)
+        self.start_note = start_note
+        self.end_note = end_note
         self.image = pygame.surface.Surface((HOLD_LINE_WIDTH, length))
         self.image.fill((0, 162, 232))
         self.rect = self.image.get_rect()
+
+    def update(self, gametime):
+        self.rect.size = self.rect.width, self.start_note.rect.top - self.end_note.rect.bottom
+        if self.rect.height > 0:
+            self.rect.midtop = self.end_note.rect.midbottom
+            self.image = pygame.surface.Surface((HOLD_LINE_WIDTH, self.rect.height))
+            self.image.fill((0, 162, 232))
+        else:
+            self.image = pygame.surface.Surface((0, 0))
 
     @staticmethod
     def gen_default_fn(flow_speed: float, decision_pos: int, init_pos: int):

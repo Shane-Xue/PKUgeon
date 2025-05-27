@@ -11,7 +11,7 @@ from pygame_gui.elements.ui_label import UILabel
 from config import *
 from sprites.abstract import AbstractNoteSprite
 from sprites.notesprite.hold import HoldLineSprite
-from sprites.notesprite.tap import TapNoteSprite
+from sprites.notesprite.tap import TapNoteSprite, HoldStartNoteSprite
 from sprites.path import PathSprite
 import event_number as en
 from gamedata.score import Score
@@ -82,10 +82,9 @@ class GameScene(scenes.Scene):
             self.notesprite[data.path][id_] = ntap
             self.notegroups[data.path].add(ntap)
         elif data.type == notedata.NoteType.HOLD:
-            nt1 = TapNoteSprite(data.time, self.tap_calc_midbottom, self.pathsprite[data.path])
+            nt1 = HoldStartNoteSprite(data.time, DECISION_POS, self.tap_calc_midbottom, self.pathsprite[data.path])
             nt2 = TapNoteSprite(data.time + data.interval, self.tap_calc_midbottom, self.pathsprite[data.path])
-            nl = HoldLineSprite(data.time, self.holdline_calc_length(data.interval),
-                                self.holdline_calc_midbottom, self.pathsprite[data.path])
+            nl = HoldLineSprite(nt1, nt2, data.time, self.holdline_calc_length(data.interval))
             self.notesprite[data.path][id_] = nt1, nt2, nl
             self.notegroups[data.path].add(nt1, nt2, nl)
 
@@ -230,6 +229,7 @@ class GameScene(scenes.Scene):
             for notegroup in self.notegroups:
                 notegroup.update(self.gamemgr.gametime)
                 notegroup.draw(self.main_window)
+            # self.main_window.fill((255, 255, 255), Rect(0, DECISION_POS, WD_WID / 2, WD_HEI - DECISION_POS))
             self.pause_guimgr.draw_ui(self.main_window)
             pygame.display.flip()
             self.clock.tick(FPS)

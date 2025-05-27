@@ -38,14 +38,12 @@ class NoteManager:
                             break
                     case notedata.NoteType.HOLD:
                         one: notedata.Hold = one
-                        if one.tail_decision != notedata.DecisionLevel.NONE:
-                            self.disposed[p] += 1
-                        elif one.time + one.interval <= self.gametime:
+                        if one.time + one.interval <= self.gametime:
                             if (one.decision == notedata.DecisionLevel.NONE or
                                     one.decision == notedata.DecisionLevel.MISS):
                                 one.decision = notedata.DecisionLevel.MISS
                                 one.tail_decision = notedata.DecisionLevel.MISS
-                            else:
+                            elif one.tail_decision == notedata.DecisionLevel.NONE:
                                 one.tail_decision = notedata.DecisionLevel.PERFECT
                             event.post(event.Event(en.DISPOSE_NOTE,
                                                    {"path": p, "id": i, "notedata": one}))
@@ -69,7 +67,6 @@ class NoteManager:
         if i >= self.created[path]: return
         while self.notes[path][i].decision != notedata.DecisionLevel.NONE:
             i += 1
-            self.disposed[path] += 1
         delta = self.notes[path][i].time - self.gametime
         if delta > MISS_INTERVAL:
             return
@@ -98,4 +95,4 @@ class NoteManager:
                 one.tail_decision = notedata.DecisionLevel.PERFECT
             else:
                 one.tail_decision = notedata.DecisionLevel.MISS
-            event.post(event.Event(en.DISPOSE_NOTE, {"path": path, "id": i, "notedata": self.notes[path][i]}))
+            # event.post(event.Event(en.DISPOSE_NOTE, {"path": path, "id": i, "notedata": self.notes[path][i]}))

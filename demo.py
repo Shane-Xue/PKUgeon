@@ -2,7 +2,6 @@ import pygame
 import json
 import scenes
 from config import *
-from gamedata.score import Score
 
 
 def main():
