@@ -9,7 +9,9 @@ from pygame import Rect
 import pygame_gui as gui
 from pygame_gui.elements.ui_label import UILabel
 from config import *
-from sprites.notesprite.tap import TapSprite, linear_calc_midbottom
+from sprites.abstract import AbstractNoteSprite
+from sprites.notesprite.hold import HoldLineSprite
+from sprites.notesprite.tap import TapNoteSprite, HoldStartNoteSprite
 from sprites.path import PathSprite
 import event_number as en
 from gamedata.score import Score
@@ -24,10 +26,14 @@ class GameScene(scenes.Scene):
 
         self.pathsprite = [PathSprite(i) for i in range(PATHS)]
         self.pathgroup = pygame.sprite.Group(self.pathsprite)
-        self.notesprite: list[dict[int, TapSprite]] = [{} for i in range(PATHS)]
+        self.notesprite: list[dict[int, AbstractNoteSprite | tuple]] = [{} for i in range(PATHS)]
         self.notegroups = [pygame.sprite.Group() for _ in range(PATHS)]
-        self.calc_midbottom = linear_calc_midbottom(self.gamemgr.userprofile.flow_speed, DECISION_POS, INIT_POS)
-
+        self.tap_calc_midbottom = TapNoteSprite.gen_default_fn(self.gamemgr.userprofile.flow_speed,
+                                                               DECISION_POS, TOP_POS)
+        self.holdline_calc_midbottom = HoldLineSprite.gen_default_fn(self.gamemgr.userprofile.flow_speed,
+                                                                     DECISION_POS, TOP_POS)
+        self.holdline_calc_length = HoldLineSprite.gen_calc_length_fn(self.gamemgr.userprofile.flow_speed,
+                                                                      DECISION_POS, TOP_POS)
         self.side_board_guimgr = gui.UIManager((WD_WID, WD_HEI), theme_path="./src/theme/ingame.json")
         self.side_board = gui.core.UIContainer((WD_WID / 2, 0, WD_WID / 2, WD_HEI),
                                                manager=self.side_board_guimgr)
@@ -72,56 +78,108 @@ class GameScene(scenes.Scene):
 
     def on_create_note(self, data: notedata.Note, id_):
         if data.type == notedata.NoteType.TAP:
-            ntap = TapSprite(self.gamemgr.gametime, data.time, self.calc_midbottom, self.pathsprite[data.path])
+            ntap = TapNoteSprite(data.time, self.tap_calc_midbottom, self.pathsprite[data.path])
             self.notesprite[data.path][id_] = ntap
             self.notegroups[data.path].add(ntap)
-        else:
-            print("error: unsupported note type")
+        elif data.type == notedata.NoteType.HOLD:
+            nt1 = HoldStartNoteSprite(data.time, DECISION_POS, self.tap_calc_midbottom, self.pathsprite[data.path])
+            nt2 = TapNoteSprite(data.time + data.interval, self.tap_calc_midbottom, self.pathsprite[data.path])
+            nl = HoldLineSprite(nt1, nt2, data.time, self.holdline_calc_length(data.interval))
+            self.notesprite[data.path][id_] = nt1, nt2, nl
+            self.notegroups[data.path].add(nt1, nt2, nl)
 
     def on_dispose_note(self, data: notedata.Note, id_):
-        match data.decision:
-            case notedata.DecisionLevel.MISS:
-                print("MISS")
-                self.score.misses += 1
-                self.score.combo = 0
-                self.score.is_ap = False
-                self.score.is_fcplus = False
-                self.score.is_fc = False
-            case notedata.DecisionLevel.PERFECT:
-                print("PERFECT")
-                self.score.perfects += 1
-                self.score.combo += 1
-                self.score.max_combo = max(self.score.combo, self.score.max_combo)
-                self.score.score += 10
-            case notedata.DecisionLevel.GREAT:
-                print("GREAT")
-                self.score.greats += 1
-                self.score.combo += 1
-                self.score.max_combo = max(self.score.combo, self.score.max_combo)
-                self.score.is_ap = False
-                self.score.score += 6
-            case notedata.DecisionLevel.GOOD:
-                print("GOOD")
-                self.score.goods += 1
-                self.score.combo += 1
-                self.score.max_combo = max(self.score.combo, self.score.max_combo)
-                self.score.is_ap = False
-                self.score.is_fcplus = False
-                self.score.score += 3
-        self.notesprite[data.path][id_].kill()
+        if data.type == notedata.NoteType.TAP:
+            match data.decision:
+                case notedata.DecisionLevel.MISS:
+                    self.score.misses += 1
+                    self.score.combo = 0
+                    self.score.is_ap = False
+                    self.score.is_fcplus = False
+                    self.score.is_fc = False
+                case notedata.DecisionLevel.PERFECT:
+                    self.score.perfects += 1
+                    self.score.combo += 1
+                    self.score.max_combo = max(self.score.combo, self.score.max_combo)
+                    self.score.score += 10
+                case notedata.DecisionLevel.GREAT:
+                    self.score.greats += 1
+                    self.score.combo += 1
+                    self.score.max_combo = max(self.score.combo, self.score.max_combo)
+                    self.score.is_ap = False
+                    self.score.score += 6
+                case notedata.DecisionLevel.GOOD:
+                    self.score.goods += 1
+                    self.score.combo += 1
+                    self.score.max_combo = max(self.score.combo, self.score.max_combo)
+                    self.score.is_ap = False
+                    self.score.is_fcplus = False
+                    self.score.score += 3
+            self.notesprite[data.path][id_].kill()
+        elif data.type == notedata.NoteType.HOLD:
+            decision = data.decision
+            print(decision, end=' ')
+            print(data.tail_decision, end=' ')
+            if data.tail_decision == notedata.DecisionLevel.MISS:
+                if decision == notedata.DecisionLevel.GREAT: decision = notedata.DecisionLevel.GOOD
+                elif decision == notedata.DecisionLevel.PERFECT: decision = notedata.DecisionLevel.GREAT
+            else:
+                if decision == notedata.DecisionLevel.MISS: decision = notedata.DecisionLevel.GOOD
+                elif decision == notedata.DecisionLevel.GOOD: decision = notedata.DecisionLevel.GREAT
+            match decision:
+                case notedata.DecisionLevel.MISS:
+                    print("MISS")
+                    self.score.misses += 1
+                    self.score.combo = 0
+                    self.score.is_ap = False
+                    self.score.is_fcplus = False
+                    self.score.is_fc = False
+                case notedata.DecisionLevel.PERFECT:
+                    print("PERFECT")
+                    self.score.perfects += 1
+                    self.score.combo += 1
+                    self.score.max_combo = max(self.score.combo, self.score.max_combo)
+                    self.score.score += 20
+                case notedata.DecisionLevel.GREAT:
+                    print("GREAT")
+                    self.score.greats += 1
+                    self.score.combo += 1
+                    self.score.max_combo = max(self.score.combo, self.score.max_combo)
+                    self.score.is_ap = False
+                    self.score.score += 12
+                case notedata.DecisionLevel.GOOD:
+                    print("GOOD")
+                    self.score.goods += 1
+                    self.score.combo += 1
+                    self.score.max_combo = max(self.score.combo, self.score.max_combo)
+                    self.score.is_ap = False
+                    self.score.is_fcplus = False
+                    self.score.score += 6
+            ss = self.notesprite[data.path][id_]
+            for s in ss: s.kill()
         self.update_side_board()
 
     def on_key_down(self, key):
         if key == self.gamemgr.userprofile.get_key('path_0'):
-            if not self.paused: self.gamemgr.decide(0)
+            if not self.paused: self.gamemgr.down(0)
         elif key == self.gamemgr.userprofile.get_key('path_1'):
-            if not self.paused: self.gamemgr.decide(1)
+            if not self.paused: self.gamemgr.down(1)
         elif key == self.gamemgr.userprofile.get_key('path_2'):
-            if not self.paused: self.gamemgr.decide(2)
+            if not self.paused: self.gamemgr.down(2)
         elif key == self.gamemgr.userprofile.get_key('path_3'):
-            if not self.paused: self.gamemgr.decide(3)
+            if not self.paused: self.gamemgr.down(3)
         elif key == pygame.K_ESCAPE:
             self.switch_pause_state()
+
+    def on_key_up(self, key):
+        if key == self.gamemgr.userprofile.get_key('path_0'):
+            if not self.paused: self.gamemgr.up(0)
+        elif key == self.gamemgr.userprofile.get_key('path_1'):
+            if not self.paused: self.gamemgr.up(1)
+        elif key == self.gamemgr.userprofile.get_key('path_2'):
+            if not self.paused: self.gamemgr.up(2)
+        elif key == self.gamemgr.userprofile.get_key('path_3'):
+            if not self.paused: self.gamemgr.up(3)
 
     def switch_pause_state(self):
         if self.paused:
@@ -149,6 +207,8 @@ class GameScene(scenes.Scene):
                     self.on_dispose_note(event.dict['notedata'], event.dict['id'])
                 elif event.type == pygame.KEYDOWN:
                     self.on_key_down(event.key)
+                elif event.type == pygame.KEYUP:
+                    self.on_key_up(event.key)
                 elif event.type == en.GAME_OVER:
                     return (scenes.GameOverScene(self.main_window, self.clock), [],
                             {"score": self.score, "retry_which": self.gamemgr.trackfile_name})
@@ -169,6 +229,7 @@ class GameScene(scenes.Scene):
             for notegroup in self.notegroups:
                 notegroup.update(self.gamemgr.gametime)
                 notegroup.draw(self.main_window)
+            # self.main_window.fill((255, 255, 255), Rect(0, DECISION_POS, WD_WID / 2, WD_HEI - DECISION_POS))
             self.pause_guimgr.draw_ui(self.main_window)
             pygame.display.flip()
             self.clock.tick(FPS)

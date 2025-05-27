@@ -33,6 +33,12 @@ class Note:
     path: int
     decision: DecisionLevel
 
+    def should_create(self):
+        pass
+
+    def should_dispose(self):
+        pass
+
     def __lt__(self, other):
         return self.path < other.path or (self.path == other.path and self.time < other.time)
 
@@ -42,5 +48,7 @@ class Hold(Note):
     """
     hold音符
     :ivar interval: 持续时间
+    :ivar interval: 玩家hold时间
     """
     interval: float
+    tail_decision: DecisionLevel

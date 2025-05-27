@@ -47,7 +47,7 @@ class GameManager:
         trackfile = gd.track_file.read_track_file(trackfile_name)
         self.bpm = trackfile.bpm
         self.duration_ms = trackfile.duration_ms
-        self.notemgr = NoteManager(trackfile.notes, self.gametime, self.userprofile.pre_creation_latency())
+        self.notemgr = NoteManager(trackfile.notes, self.gametime, self.userprofile.pre_creation_offset())
 
         # todo 读取music file
 
@@ -67,5 +67,8 @@ class GameManager:
             self.status = GameManager.Status.STOPPED
         # todo
 
-    def decide(self, path: int):
-        self.notemgr.decide(path)
+    def down(self, path: int):
+        self.notemgr.down(path)
+
+    def up(self, path: int):
+        self.notemgr.up(path)
