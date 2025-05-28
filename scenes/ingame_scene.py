@@ -21,6 +21,8 @@ class GameScene(scenes.Scene):
         self.userprofile = UserProfile()
         self.game_renderer = None
 
+        self.auto_play = False
+
         self.decision_label_group = pygame.sprite.Group()
         self.side_board_guimgr = gui.UIManager((WD_WID, WD_HEI), theme_path="./res/theme/ingame.json")
         self.side_board = gui.core.UIContainer((WD_WID / 2, 0, WD_WID / 2, WD_HEI),
@@ -60,7 +62,7 @@ class GameScene(scenes.Scene):
         self.decision_label: list[ColoredTextSprite] = [None for _ in range(PATHS)]
 
     def update_side_board(self):
-        self.badge_label.set_text(f"{'AP' if self.score.is_ap else '  '} {'FC+' if self.score.is_fcplus else '   '}"
+        self.badge_label.set_text(f"{'AP' if self.score.is_ap else '  '}  {'FC+' if self.score.is_fcplus else '   '}  "
                                   f"{'FC' if self.score.is_fc else '  '}")
         self.score_label.set_text(f"SCORE: {self.score.score:>8}")
         self.combo_label.set_text(f"COMBO: {self.score.combo:>5} (MAX: {self.score.max_combo:>5})")
@@ -96,34 +98,36 @@ class GameScene(scenes.Scene):
         self.show_tap_effect(path, decision)
 
     def on_key_down(self, key):
-        if key == self.userprofile.get_key('path_0'):
-            if not self.paused:
-                print('d0')
-                self.game_renderer.key_down(0)
-        elif key == self.userprofile.get_key('path_1'):
-            if not self.paused:
-                print('d1')
-                self.game_renderer.key_down(1)
-        elif key == self.userprofile.get_key('path_2'):
-            if not self.paused:
-                print('d2')
-                self.game_renderer.key_down(2)
-        elif key == self.userprofile.get_key('path_3'):
-            if not self.paused:
-                print('d3')
-                self.game_renderer.key_down(3)
-        elif key == pygame.K_ESCAPE:
+        if not self.auto_play:
+            if key == self.userprofile.get_key('path_0'):
+                if not self.paused:
+                    print('d0')
+                    self.game_renderer.key_down(0)
+            elif key == self.userprofile.get_key('path_1'):
+                if not self.paused:
+                    print('d1')
+                    self.game_renderer.key_down(1)
+            elif key == self.userprofile.get_key('path_2'):
+                if not self.paused:
+                    print('d2')
+                    self.game_renderer.key_down(2)
+            elif key == self.userprofile.get_key('path_3'):
+                if not self.paused:
+                    print('d3')
+                    self.game_renderer.key_down(3)
+        if key == pygame.K_ESCAPE:
             self.switch_pause_state()
 
     def on_key_up(self, key):
-        if key == self.userprofile.get_key('path_0'):
-            if not self.paused: self.game_renderer.key_up(0)
-        elif key == self.userprofile.get_key('path_1'):
-            if not self.paused: self.game_renderer.key_up(1)
-        elif key == self.userprofile.get_key('path_2'):
-            if not self.paused: self.game_renderer.key_up(2)
-        elif key == self.userprofile.get_key('path_3'):
-            if not self.paused: self.game_renderer.key_up(3)
+        if not self.auto_play:
+            if key == self.userprofile.get_key('path_0'):
+                if not self.paused: self.game_renderer.key_up(0)
+            elif key == self.userprofile.get_key('path_1'):
+                if not self.paused: self.game_renderer.key_up(1)
+            elif key == self.userprofile.get_key('path_2'):
+                if not self.paused: self.game_renderer.key_up(2)
+            elif key == self.userprofile.get_key('path_3'):
+                if not self.paused: self.game_renderer.key_up(3)
 
     def switch_pause_state(self):
         if self.paused:
@@ -186,6 +190,10 @@ class GameScene(scenes.Scene):
                     self.hide_tap_effect(event.type - en.HIDE_TAP_EFFECT)
                 elif event.type == en.DECISION:
                     self.on_decision(event.dict['type_'], event.dict['decision'], event.dict['path'])
+            if self.auto_play:
+                for i in range(PATHS):
+                    self.game_renderer.key_down(i, True)
+                    self.game_renderer.key_up(i, True)
             if not self.paused:
                 self.game_renderer.update(self.clock.get_time())
             self.side_board_guimgr.update(self.clock.get_time() / 1000)

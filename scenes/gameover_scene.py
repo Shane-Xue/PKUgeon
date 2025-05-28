@@ -35,7 +35,7 @@ class GameOverScene(scenes.Scene):
         score: Score = kwargs['score']
         retry_which = kwargs['retry_which']
 
-        self.badge_label.set_text(f"{'AP' if score.is_ap else '  '} {'FC+' if score.is_fcplus else '   '}"
+        self.badge_label.set_text(f"{'AP' if score.is_ap else '  '}  {'FC+' if score.is_fcplus else '   '}  "
                                   f"{'FC' if score.is_fc else '  '}")
         self.perfects_label.set_text(f"Perfect: {score.perfects}")
         self.greats_label.set_text(f"Greats: {score.greats}")

@@ -39,8 +39,8 @@ class GameManager:
             event.post(event.Event(en.GAME_OVER))
         # todo
 
-    def down(self, path: int):
-        self.notemgr.down(path)
+    def down(self, path: int, auto_op: bool = False):
+        self.notemgr.down(path, auto_op)
 
-    def up(self, path: int):
-        self.notemgr.up(path)
+    def up(self, path: int, auto_op: bool = False):
+        self.notemgr.up(path, auto_op)

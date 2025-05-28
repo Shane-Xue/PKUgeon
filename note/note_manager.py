@@ -61,7 +61,7 @@ class NoteManager:
                 else:
                     break
 
-    def down(self, path: int):
+    def down(self, path: int, auto_op: bool = False):
         """
         path轨道被按下，判定tap和hold的头判
         """
@@ -70,20 +70,27 @@ class NoteManager:
         while self.notes[path][i].decision != notedata.DecisionLevel.NONE and i < self.created[path] - 1:
             i += 1
         delta = self.notes[path][i].time - self.gametime
-        if delta > MISS_INTERVAL:
-            return
-        if abs(delta) < PERFECT_INTERVAL:
-            self.notes[path][i].decision = notedata.DecisionLevel.PERFECT
-        elif abs(delta) < GREAT_INTERVAL:
-            self.notes[path][i].decision = notedata.DecisionLevel.GREAT
-        elif abs(delta) < GOOD_INTERVAL:
-            self.notes[path][i].decision = notedata.DecisionLevel.GOOD
+        if auto_op:
+            if delta < PERFECT_INTERVAL:
+                self.notes[path][i].decision = notedata.DecisionLevel.PERFECT
+                if self.notes[path][i].type == notedata.NoteType.TAP:
+                    event.post(event.Event(en.DISPOSE_NOTE,
+                                           {"path": path, "id": i, "notedata": self.notes[path][i]}))
         else:
-            self.notes[path][i].decision = notedata.DecisionLevel.MISS
-        if self.notes[path][i].type == notedata.NoteType.TAP:
-            event.post(event.Event(en.DISPOSE_NOTE, {"path": path, "id": i, "notedata": self.notes[path][i]}))
+            if delta > MISS_INTERVAL:
+                return
+            if abs(delta) < PERFECT_INTERVAL:
+                self.notes[path][i].decision = notedata.DecisionLevel.PERFECT
+            elif abs(delta) < GREAT_INTERVAL:
+                self.notes[path][i].decision = notedata.DecisionLevel.GREAT
+            elif abs(delta) < GOOD_INTERVAL:
+                self.notes[path][i].decision = notedata.DecisionLevel.GOOD
+            else:
+                self.notes[path][i].decision = notedata.DecisionLevel.MISS
+            if self.notes[path][i].type == notedata.NoteType.TAP:
+                event.post(event.Event(en.DISPOSE_NOTE, {"path": path, "id": i, "notedata": self.notes[path][i]}))
 
-    def up(self, path: int):
+    def up(self, path: int, auto_op: bool = False):
         """
         path轨道被松开，判定hold的尾判
         """
@@ -92,10 +99,13 @@ class NoteManager:
         one: notedata.Hold = self.notes[path][i]
         if (one.type == notedata.NoteType.HOLD and one.decision != notedata.DecisionLevel.NONE
                 and one.tail_decision == notedata.DecisionLevel.NONE):
-            delta = one.time + one.interval
-            if one.time + one.interval - self.gametime < GOOD_INTERVAL:
-                one.tail_decision = notedata.DecisionLevel.PERFECT
+            delta = one.time + one.interval - self.gametime
+            if auto_op:
+                if delta < PERFECT_INTERVAL:
+                    one.tail_decision = notedata.DecisionLevel.PERFECT
             else:
-                one.tail_decision = notedata.DecisionLevel.MISS
-                event.post(event.Event(en.HOLD_EARLY_RELEASE, {"path": path, "id": i}))
-            # event.post(event.Event(en.DISPOSE_NOTE, {"path": path, "id": i, "notedata": self.notes[path][i]}))
+                if delta < GOOD_INTERVAL:
+                    one.tail_decision = notedata.DecisionLevel.PERFECT
+                else:
+                    one.tail_decision = notedata.DecisionLevel.MISS
+                    event.post(event.Event(en.HOLD_EARLY_RELEASE, {"path": path, "id": i}))

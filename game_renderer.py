@@ -83,9 +83,9 @@ class GameRenderer:
                                            {'decision': decision, 'type_': data.type, 'path': data.path}))
             print("post ", decision, data.type, data.path)
 
-    def key_down(self, path: int):
-        self.gamemgr.down(path)
+    def key_down(self, path: int, auto_op: bool = False):
+        self.gamemgr.down(path, auto_op)
 
-    def key_up(self, path: int):
-        self.gamemgr.up(path)
+    def key_up(self, path: int, auto_op: bool = False):
+        self.gamemgr.up(path, auto_op)
 

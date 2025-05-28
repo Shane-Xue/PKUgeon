@@ -4,6 +4,8 @@ import pygame_gui as gui
 import gamedata.track_file
 import scenes
 from config import *
+from game_renderer import GameRenderer
+from gamedata.user_profile import UserProfile
 
 
 class MainScene(scenes.Scene):
@@ -21,11 +23,15 @@ class MainScene(scenes.Scene):
         self.title_label = gui.elements.UILabel(pygame.Rect(WD_WID * 0.3, WD_HEI * 0.2, WD_WID * 0.4, 50),
                                                 "PKUgeon",  manager=self.uimgr)
 
+        self.demo = GameRenderer(UserProfile(), gamedata.track_file.read_track_file('demo'))
+        self.demo_over = False
+
     def main_loop(self, *args, **kwargs) -> tuple[scenes.Scene | None, list, dict]:
         going = True
 
         while going:
             for event in pygame.event.get():
+                self.demo.process_events(event)
                 if event.type == pygame.QUIT:
                     return None, [], {}
                 elif event.type == gui.UI_BUTTON_PRESSED:
@@ -39,9 +45,13 @@ class MainScene(scenes.Scene):
                             print("chart maker not implemented")
                 self.uimgr.process_events(event)
             delta = self.clock.tick(FPS)
+            for i in range(PATHS):
+                self.demo.key_down(i, True)
+                self.demo.key_up(i, True)
             self.uimgr.update(delta / 1000)
-
+            self.demo.update(delta)
             self.main_window.fill((255, 255, 255))
+            self.main_window.blit(self.demo.render(), (WD_WID / 2, 0))
             self.uimgr.draw_ui(self.main_window)
 
             pygame.display.flip()
