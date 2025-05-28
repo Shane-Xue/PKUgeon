@@ -36,7 +36,7 @@ class GameScene(scenes.Scene):
                                                                      DECISION_POS, TOP_POS)
         self.holdline_calc_length = HoldLineSprite.gen_calc_length_fn(self.gamemgr.userprofile.flow_speed,
                                                                       DECISION_POS, TOP_POS)
-        self.side_board_guimgr = gui.UIManager((WD_WID, WD_HEI), theme_path="./src/theme/ingame.json")
+        self.side_board_guimgr = gui.UIManager((WD_WID, WD_HEI), theme_path="./res/theme/ingame.json")
         self.side_board = gui.core.UIContainer((WD_WID / 2, 0, WD_WID / 2, WD_HEI),
                                                manager=self.side_board_guimgr)
         self.badge_label = UILabel(pygame.Rect((100, 100), (WD_WID / 2 - 100, 100)),
@@ -55,7 +55,7 @@ class GameScene(scenes.Scene):
         self.score = Score()
         self.update_side_board()
 
-        self.pause_guimgr = gui.UIManager((WD_WID, WD_HEI), theme_path="./src/theme/pause_menu.json")
+        self.pause_guimgr = gui.UIManager((WD_WID, WD_HEI), theme_path="./res/theme/pause_menu.json")
         self.pause_menu = gui.core.UIContainer((WD_WID * 0.1, WD_HEI * 0.2, WD_WID * 0.3, WD_HEI * 0.6),
                                                manager=self.pause_guimgr)
         self.pause_menu.hide()
@@ -201,13 +201,13 @@ class GameScene(scenes.Scene):
             self.decision_label[path].kill()
         center = self.pathsprite[path].rect.midbottom
         if decision_level == notedata.DecisionLevel.PERFECT:
-            self.decision_label[path] = ColoredTextSprite.perfect(center)
+            self.decision_label[path] = ColoredTextSprite.perfect((center[0], center[1] + 30))
         elif decision_level == notedata.DecisionLevel.GREAT:
-            self.decision_label[path] = ColoredTextSprite.great(center)
+            self.decision_label[path] = ColoredTextSprite.great((center[0], center[1] + 30))
         elif decision_level == notedata.DecisionLevel.GOOD:
-            self.decision_label[path] = ColoredTextSprite.good(center)
+            self.decision_label[path] = ColoredTextSprite.good((center[0], center[1] + 30))
         elif decision_level == notedata.DecisionLevel.MISS:
-            self.decision_label[path] = ColoredTextSprite.miss(center)
+            self.decision_label[path] = ColoredTextSprite.miss((center[0], center[1] + 30))
         self.decision_label_group.add(self.decision_label[path])
         pygame.time.set_timer(pygame.event.Event(en.HIDE_TAP_EFFECT + path), 500, loops=1)
 
@@ -217,8 +217,6 @@ class GameScene(scenes.Scene):
             self.decision_label[path] = None
 
     def main_loop(self, *args, **kwargs) -> tuple[scenes.Scene | None, list, dict]:
-        self.gamemgr.prepare(kwargs['trackfile_name'])
-
         going = True
 
         while going:
@@ -243,11 +241,14 @@ class GameScene(scenes.Scene):
                     if event.ui_element == self.resume_button:
                         self.switch_pause_state()
                     elif event.ui_element == self.retry_button:
-                        return scenes.GameScene(self.main_window, self.clock), args, kwargs
+                        return scenes.ChartInfoScene(self.main_window, self.clock), args, kwargs
                     elif event.ui_element == self.exit_button:
                         return scenes.MainScene(self.main_window, self.clock), [], {}
                 elif en.HIDE_TAP_EFFECT <= event.type < en.HIDE_TAP_EFFECT + PATHS:
                     self.hide_tap_effect(event.type - en.HIDE_TAP_EFFECT)
+                elif event.type == en.HOLD_EARLY_RELEASE:
+                    for s in self.notesprite[event.dict['path']][event.dict['id']]:
+                        s.image.fill((108, 108, 108))
             if not self.paused:
                 self.gamemgr.update(self.clock.get_time())
             self.side_board_guimgr.update(self.clock.get_time() / 1000)

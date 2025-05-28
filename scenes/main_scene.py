@@ -29,8 +29,8 @@ class MainScene(scenes.Scene):
                 elif event.type == gui.UI_BUTTON_PRESSED:
                     match event.ui_element:
                         case self.start_button:
-                            return (scenes.GameScene(self.main_window, self.clock), [],
-                                    {"trackfile_name": "demo"})
+                            return (scenes.ChartInfoScene(self.main_window, self.clock), [],
+                                    {'trackfile_name': 'demo'})
                         case self.exit_button:
                             return None, [], {}
                         case self.chart_maker_button:

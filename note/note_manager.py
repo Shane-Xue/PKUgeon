@@ -95,4 +95,5 @@ class NoteManager:
                 one.tail_decision = notedata.DecisionLevel.PERFECT
             else:
                 one.tail_decision = notedata.DecisionLevel.MISS
+                event.post(event.Event(en.HOLD_EARLY_RELEASE, {"path": path, "id": i}))
             # event.post(event.Event(en.DISPOSE_NOTE, {"path": path, "id": i, "notedata": self.notes[path][i]}))

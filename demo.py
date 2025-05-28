@@ -18,9 +18,11 @@ def main():
 
 def random_generate():
     """为了测试先随机生成个谱面"""
-    trkdata = {'duration_ms': 60000, 'bpm': 60, 'notes': []}
+    trkdata = {'duration_ms': 60000, 'bpm': 60, 'title': 'RANDOM', 'artist': 'None',
+               'chart_maker': 'Random', 'level': 12, 'notes': []}
     # 全部弄成8分好了
     t = 2000
+
     class R:
         def __init__(self):
             self.r = 2000
@@ -28,6 +30,7 @@ def random_generate():
         def __call__(self):
             self.r = self.r * 313 % 997
             return self.r % 4
+
     r = R()
     while t < 60000:
         if r() % 10 == 0:
@@ -42,7 +45,7 @@ def random_generate():
                                      'time': t,
                                      })
             t += 1000 / 8
-    with open('gamedata/resources/demo/demo', 'w') as file:
+    with open('save/trackfile/demo/demo', 'w') as file:
         json.dump(trkdata, file)
 
 

@@ -19,7 +19,7 @@ class UserProfile:
         return 5000 / self.flow_speed
     
     def __init__(self):
-        proflie = json.load(open('gamedata/user_profile.json', 'r'))
+        proflie = json.load(open('save/user_profile.json', 'r'))
         self.flow_speed = proflie['flow_speed']
         self.latency = proflie['latency']
         self.key_bindings = {}
