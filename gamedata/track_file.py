@@ -66,7 +66,7 @@ def read_track_file(filename: str) -> TrackFile:
                                                                   float(note['interval']),
                                                                   notedata.DecisionLevel.NONE))
         for i in range(PATHS):
-            ret.notes.sort()
+            ret.notes[i].sort()
     return ret
 
 

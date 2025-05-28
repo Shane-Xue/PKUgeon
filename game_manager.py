@@ -19,42 +19,14 @@ class GameManager:
     """
     :ivar gametime: 游戏进程时间，直接控制游戏内各“可视”元素，比如note
     :ivar musictime: 音乐时间，仅用于控制音乐播放，以此达到调整按键延迟
-    :ivar status: GameManager目前的状态
     """
-    class Status(Enum):
-        INITIALIZED = auto()
-        READY = auto()
-        STARTED = auto()
-        STOPPED = auto()
-
-    def __init__(self, userprofile: gd.user_profile.UserProfile):
+    def __init__(self, userprofile: gd.user_profile.UserProfile, trackfile: TrackFile):
         self.userprofile = userprofile
         self.gametime = -config.GAP_TIME
         self.musictime = userprofile.latency - config.GAP_TIME
-        self.trackfile_name: str = None
-        self.trackfile: TrackFile = None
-        self.status = GameManager.Status.INITIALIZED
-        self.notemgr: NoteManager = None
-        self.duration_ms = 0
-
-    def prepare(self, trackfile_name: str):
-        """
-        在game_start前调用，为开始游戏做好准备：
-        1. 读取track file
-        2. 读取music file
-        """
-        self.status = GameManager.Status.READY
-        self.trackfile_name = trackfile_name
-        # 读取track file
-        self.trackfile = gd.track_file.read_track_file(trackfile_name)
+        self.trackfile = trackfile
         self.notemgr = NoteManager(self.trackfile.notes, self.gametime, self.userprofile.pre_creation_offset())
         self.duration_ms = self.trackfile.duration_ms
-
-        # todo 读取music file
-
-    def game_start(self):
-        self.status = GameManager.Status.STARTED
-        # todo
 
     def update(self, delta: float):
         """
@@ -65,7 +37,6 @@ class GameManager:
         self.notemgr.update(delta)
         if self.gametime >= self.duration_ms + config.GAP_TIME:
             event.post(event.Event(en.GAME_OVER))
-            self.status = GameManager.Status.STOPPED
         # todo
 
     def down(self, path: int):

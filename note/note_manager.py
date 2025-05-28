@@ -1,3 +1,5 @@
+import copy
+
 from . import notedata
 from config import *
 import pygame
@@ -13,7 +15,7 @@ class NoteManager:
     :ivar pre_creation_offset: note对象的创建比被判定时间提前的时间
     """
     def __init__(self, notes: list[list[notedata.Note]], gametime: float, pre_creation_offset: float):
-        self.notes = notes
+        self.notes = copy.deepcopy(notes)
         self.disposed: list[int] = [0 for _ in range(PATHS)]
         self.created: list[int] = [0 for _ in range(PATHS)]
         self.gametime = gametime

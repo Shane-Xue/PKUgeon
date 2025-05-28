@@ -33,7 +33,7 @@ class GameOverScene(scenes.Scene):
 
     def main_loop(self, *args, **kwargs) -> tuple[scenes.Scene | None, list, dict]:
         score: Score = kwargs['score']
-        retry_which: str = kwargs['retry_which']
+        retry_which = kwargs['retry_which']
 
         self.badge_label.set_text(f"{'AP' if score.is_ap else '  '} {'FC+' if score.is_fcplus else '   '}"
                                   f"{'FC' if score.is_fc else '  '}")
@@ -54,7 +54,7 @@ class GameOverScene(scenes.Scene):
                     match event.ui_element:
                         case self.retry_button:
                             return (scenes.GameScene(self.main_window, self.clock), [],
-                                    {"trackfile_name": retry_which})
+                                    {"trackfile": retry_which})
                         case self.exit_button:
                             return scenes.MainScene(self.main_window, self.clock), [], {}
                 self.uimgr.process_events(event)

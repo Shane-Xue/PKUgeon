@@ -1,5 +1,7 @@
 import pygame
 import pygame_gui as gui
+
+import gamedata.track_file
 import scenes
 from config import *
 
@@ -10,11 +12,11 @@ class MainScene(scenes.Scene):
         self.uimgr = gui.UIManager((WD_WID, WD_HEI))
 
         self.start_button = gui.elements.UIButton(pygame.Rect((100, 100), (200, 100)),
-                                                  "start", manager=self.uimgr)
+                                                  "Start", manager=self.uimgr)
         self.exit_button = gui.elements.UIButton(pygame.Rect((100, 500), (200, 100)),
-                                                 "quit", manager=self.uimgr)
+                                                 "Quit", manager=self.uimgr)
         self.chart_maker_button = gui.elements.UIButton(pygame.Rect((100, 300), (200, 100)),
-                                                        "chart maker", manager=self.uimgr)
+                                                        "Chart Maker", manager=self.uimgr)
         self.chart_maker_button.disable()
         self.title_label = gui.elements.UILabel(pygame.Rect(WD_WID * 0.3, WD_HEI * 0.2, WD_WID * 0.4, 50),
                                                 "PKUgeon",  manager=self.uimgr)
@@ -30,7 +32,7 @@ class MainScene(scenes.Scene):
                     match event.ui_element:
                         case self.start_button:
                             return (scenes.ChartInfoScene(self.main_window, self.clock), [],
-                                    {'trackfile_name': 'demo'})
+                                    {'trackfile': gamedata.track_file.read_track_file('demo')})
                         case self.exit_button:
                             return None, [], {}
                         case self.chart_maker_button:

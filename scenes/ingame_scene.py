@@ -1,6 +1,7 @@
 from pygame_gui.elements import UIButton
 
 import game_manager
+from game_renderer import GameRenderer
 from gamedata.user_profile import UserProfile
 from note import notedata
 import scenes
@@ -9,10 +10,6 @@ from pygame import Rect
 import pygame_gui as gui
 from pygame_gui.elements.ui_label import UILabel
 from config import *
-from sprites.abstract import AbstractNoteSprite
-from sprites.notesprite.hold import HoldLineSprite
-from sprites.notesprite.tap import TapNoteSprite, HoldStartNoteSprite
-from sprites.path import PathSprite
 import event_number as en
 from gamedata.score import Score
 from sprites.tap_effect import ColoredTextSprite
@@ -21,21 +18,10 @@ from sprites.tap_effect import ColoredTextSprite
 class GameScene(scenes.Scene):
     def __init__(self, main_window: pygame.Surface, clock: pygame.Clock):
         super().__init__(main_window, clock)
+        self.userprofile = UserProfile()
+        self.game_renderer = None
 
-        self.gamemgr = game_manager.GameManager(UserProfile())
-        self.paused = False
-
-        self.pathsprite = [PathSprite(i) for i in range(PATHS)]
-        self.pathgroup = pygame.sprite.Group(self.pathsprite)
-        self.notesprite: list[dict[int, AbstractNoteSprite | tuple]] = [{} for i in range(PATHS)]
-        self.notegroups = [pygame.sprite.Group() for _ in range(PATHS)]
         self.decision_label_group = pygame.sprite.Group()
-        self.tap_calc_midbottom = TapNoteSprite.gen_default_fn(self.gamemgr.userprofile.flow_speed,
-                                                               DECISION_POS, TOP_POS)
-        self.holdline_calc_midbottom = HoldLineSprite.gen_default_fn(self.gamemgr.userprofile.flow_speed,
-                                                                     DECISION_POS, TOP_POS)
-        self.holdline_calc_length = HoldLineSprite.gen_calc_length_fn(self.gamemgr.userprofile.flow_speed,
-                                                                      DECISION_POS, TOP_POS)
         self.side_board_guimgr = gui.UIManager((WD_WID, WD_HEI), theme_path="./res/theme/ingame.json")
         self.side_board = gui.core.UIContainer((WD_WID / 2, 0, WD_WID / 2, WD_HEI),
                                                manager=self.side_board_guimgr)
@@ -55,6 +41,8 @@ class GameScene(scenes.Scene):
         self.score = Score()
         self.update_side_board()
 
+        self.paused = False
+
         self.pause_guimgr = gui.UIManager((WD_WID, WD_HEI), theme_path="./res/theme/pause_menu.json")
         self.pause_menu = gui.core.UIContainer((WD_WID * 0.1, WD_HEI * 0.2, WD_WID * 0.3, WD_HEI * 0.6),
                                                manager=self.pause_guimgr)
@@ -71,122 +59,71 @@ class GameScene(scenes.Scene):
 
         self.decision_label: list[ColoredTextSprite] = [None for _ in range(PATHS)]
 
-
     def update_side_board(self):
-        # self.side_board.fill((255, 255, 255))
         self.badge_label.set_text(f"{'AP' if self.score.is_ap else '  '} {'FC+' if self.score.is_fcplus else '   '}"
                                   f"{'FC' if self.score.is_fc else '  '}")
         self.score_label.set_text(f"SCORE: {self.score.score:>8}")
         self.combo_label.set_text(f"COMBO: {self.score.combo:>5} (MAX: {self.score.max_combo:>5})")
-        # self.side_board_guimgr.draw_ui(self.side_board)
-        # self.main_window.blit(self.side_board, (640, 0))
 
-    def on_create_note(self, data: notedata.Note, id_):
-        if data.type == notedata.NoteType.TAP:
-            ntap = TapNoteSprite(data.time, self.tap_calc_midbottom, self.pathsprite[data.path])
-            self.notesprite[data.path][id_] = ntap
-            self.notegroups[data.path].add(ntap)
-        elif data.type == notedata.NoteType.HOLD:
-            nt1 = HoldStartNoteSprite(data.time, DECISION_POS, self.tap_calc_midbottom, self.pathsprite[data.path])
-            nt2 = TapNoteSprite(data.time + data.interval, self.tap_calc_midbottom, self.pathsprite[data.path])
-            nl = HoldLineSprite(nt1, nt2, data.time, self.holdline_calc_length(data.interval))
-            self.notesprite[data.path][id_] = nt1, nt2, nl
-            self.notegroups[data.path].add(nt1, nt2, nl)
-
-    def on_dispose_note(self, data: notedata.Note, id_):
-        if data.type == notedata.NoteType.TAP:
-            match data.decision:
-                case notedata.DecisionLevel.MISS:
-                    self.score.misses += 1
-                    self.score.combo = 0
-                    self.score.is_ap = False
-                    self.score.is_fcplus = False
-                    self.score.is_fc = False
-                case notedata.DecisionLevel.PERFECT:
-                    self.score.perfects += 1
-                    self.score.combo += 1
-                    self.score.max_combo = max(self.score.combo, self.score.max_combo)
-                    self.score.score += 10
-                case notedata.DecisionLevel.GREAT:
-                    self.score.greats += 1
-                    self.score.combo += 1
-                    self.score.max_combo = max(self.score.combo, self.score.max_combo)
-                    self.score.is_ap = False
-                    self.score.score += 6
-                case notedata.DecisionLevel.GOOD:
-                    self.score.goods += 1
-                    self.score.combo += 1
-                    self.score.max_combo = max(self.score.combo, self.score.max_combo)
-                    self.score.is_ap = False
-                    self.score.is_fcplus = False
-                    self.score.score += 3
-            self.notesprite[data.path][id_].kill()
-        elif data.type == notedata.NoteType.HOLD:
-            decision = data.decision
-            print(decision, end=' ')
-            print(data.tail_decision, end=' ')
-            if data.tail_decision == notedata.DecisionLevel.MISS:
-                if decision == notedata.DecisionLevel.GREAT: decision = notedata.DecisionLevel.GOOD
-                elif decision == notedata.DecisionLevel.PERFECT: decision = notedata.DecisionLevel.GREAT
-            else:
-                if decision == notedata.DecisionLevel.MISS: decision = notedata.DecisionLevel.GOOD
-                elif decision == notedata.DecisionLevel.GOOD: decision = notedata.DecisionLevel.GREAT
-            data.decision = decision
-            match decision:
-                case notedata.DecisionLevel.MISS:
-                    print("MISS")
-                    self.score.misses += 1
-                    self.score.combo = 0
-                    self.score.is_ap = False
-                    self.score.is_fcplus = False
-                    self.score.is_fc = False
-                case notedata.DecisionLevel.PERFECT:
-                    print("PERFECT")
-                    self.score.perfects += 1
-                    self.score.combo += 1
-                    self.score.max_combo = max(self.score.combo, self.score.max_combo)
-                    self.score.score += 20
-                case notedata.DecisionLevel.GREAT:
-                    print("GREAT")
-                    self.score.greats += 1
-                    self.score.combo += 1
-                    self.score.max_combo = max(self.score.combo, self.score.max_combo)
-                    self.score.is_ap = False
-                    self.score.score += 12
-                case notedata.DecisionLevel.GOOD:
-                    print("GOOD")
-                    self.score.goods += 1
-                    self.score.combo += 1
-                    self.score.max_combo = max(self.score.combo, self.score.max_combo)
-                    self.score.is_ap = False
-                    self.score.is_fcplus = False
-                    self.score.score += 6
-            ss = self.notesprite[data.path][id_]
-            for s in ss: s.kill()
+    def on_decision(self, type_: notedata.NoteType, decision: notedata.DecisionLevel, path: int):
+        mult = 1 if type_ == type_.TAP else 2
+        match decision:
+            case notedata.DecisionLevel.MISS:
+                self.score.misses += 1
+                self.score.combo = 0
+                self.score.is_ap = False
+                self.score.is_fcplus = False
+                self.score.is_fc = False
+            case notedata.DecisionLevel.PERFECT:
+                self.score.perfects += 1
+                self.score.combo += 1
+                self.score.max_combo = max(self.score.combo, self.score.max_combo)
+                self.score.score += 10 * mult
+            case notedata.DecisionLevel.GREAT:
+                self.score.greats += 1
+                self.score.combo += 1
+                self.score.max_combo = max(self.score.combo, self.score.max_combo)
+                self.score.is_ap = False
+                self.score.score += 8 * mult
+            case notedata.DecisionLevel.GOOD:
+                self.score.goods += 1
+                self.score.combo += 1
+                self.score.max_combo = max(self.score.combo, self.score.max_combo)
+                self.score.is_ap = False
+                self.score.is_fcplus = False
+                self.score.score += 5 * mult
         self.update_side_board()
-        self.show_tap_effect(data.path, data.decision)
+        self.show_tap_effect(path, decision)
 
     def on_key_down(self, key):
-        if key == self.gamemgr.userprofile.get_key('path_0'):
-            if not self.paused: self.gamemgr.down(0)
-        elif key == self.gamemgr.userprofile.get_key('path_1'):
-            if not self.paused: self.gamemgr.down(1)
-        elif key == self.gamemgr.userprofile.get_key('path_2'):
-            if not self.paused: self.gamemgr.down(2)
-        elif key == self.gamemgr.userprofile.get_key('path_3'):
-            if not self.paused: self.gamemgr.down(3)
+        if key == self.userprofile.get_key('path_0'):
+            if not self.paused:
+                print('d0')
+                self.game_renderer.key_down(0)
+        elif key == self.userprofile.get_key('path_1'):
+            if not self.paused:
+                print('d1')
+                self.game_renderer.key_down(1)
+        elif key == self.userprofile.get_key('path_2'):
+            if not self.paused:
+                print('d2')
+                self.game_renderer.key_down(2)
+        elif key == self.userprofile.get_key('path_3'):
+            if not self.paused:
+                print('d3')
+                self.game_renderer.key_down(3)
         elif key == pygame.K_ESCAPE:
             self.switch_pause_state()
 
     def on_key_up(self, key):
-        if key == self.gamemgr.userprofile.get_key('path_0'):
-            if not self.paused: self.gamemgr.up(0)
-        elif key == self.gamemgr.userprofile.get_key('path_1'):
-            if not self.paused: self.gamemgr.up(1)
-        elif key == self.gamemgr.userprofile.get_key('path_2'):
-            if not self.paused: self.gamemgr.up(2)
-        elif key == self.gamemgr.userprofile.get_key('path_3'):
-            if not self.paused: self.gamemgr.up(3)
+        if key == self.userprofile.get_key('path_0'):
+            if not self.paused: self.game_renderer.key_up(0)
+        elif key == self.userprofile.get_key('path_1'):
+            if not self.paused: self.game_renderer.key_up(1)
+        elif key == self.userprofile.get_key('path_2'):
+            if not self.paused: self.game_renderer.key_up(2)
+        elif key == self.userprofile.get_key('path_3'):
+            if not self.paused: self.game_renderer.key_up(3)
 
     def switch_pause_state(self):
         if self.paused:
@@ -199,15 +136,15 @@ class GameScene(scenes.Scene):
     def show_tap_effect(self, path: int, decision_level: notedata.DecisionLevel):
         if self.decision_label[path] is not None:
             self.decision_label[path].kill()
-        center = self.pathsprite[path].rect.midbottom
+        center = WD_WID / 2 * (2 * path + 1) / 2 / PATHS, 1000
         if decision_level == notedata.DecisionLevel.PERFECT:
-            self.decision_label[path] = ColoredTextSprite.perfect((center[0], center[1] + 30))
+            self.decision_label[path] = ColoredTextSprite.perfect((center[0], center[1]))
         elif decision_level == notedata.DecisionLevel.GREAT:
-            self.decision_label[path] = ColoredTextSprite.great((center[0], center[1] + 30))
+            self.decision_label[path] = ColoredTextSprite.great((center[0], center[1]))
         elif decision_level == notedata.DecisionLevel.GOOD:
-            self.decision_label[path] = ColoredTextSprite.good((center[0], center[1] + 30))
+            self.decision_label[path] = ColoredTextSprite.good((center[0], center[1]))
         elif decision_level == notedata.DecisionLevel.MISS:
-            self.decision_label[path] = ColoredTextSprite.miss((center[0], center[1] + 30))
+            self.decision_label[path] = ColoredTextSprite.miss((center[0], center[1]))
         self.decision_label_group.add(self.decision_label[path])
         pygame.time.set_timer(pygame.event.Event(en.HIDE_TAP_EFFECT + path), 500, loops=1)
 
@@ -217,26 +154,27 @@ class GameScene(scenes.Scene):
             self.decision_label[path] = None
 
     def main_loop(self, *args, **kwargs) -> tuple[scenes.Scene | None, list, dict]:
+        self.game_renderer = GameRenderer(self.userprofile, kwargs['trackfile'])
+
         going = True
+
+        pygame.event.clear()
 
         while going:
             self.main_window.fill((255, 255, 255))
             for event in pygame.event.get():
                 self.side_board_guimgr.process_events(event)
                 self.pause_guimgr.process_events(event)
+                self.game_renderer.process_events(event)
                 if event.type == pygame.QUIT:
                     return None, [], {}
-                elif event.type == en.CREATE_NOTE:
-                    self.on_create_note(event.dict['notedata'], event.dict['id'])
-                elif event.type == en.DISPOSE_NOTE:
-                    self.on_dispose_note(event.dict['notedata'], event.dict['id'])
                 elif event.type == pygame.KEYDOWN:
                     self.on_key_down(event.key)
                 elif event.type == pygame.KEYUP:
                     self.on_key_up(event.key)
                 elif event.type == en.GAME_OVER:
                     return (scenes.GameOverScene(self.main_window, self.clock), [],
-                            {"score": self.score, "retry_which": self.gamemgr.trackfile_name})
+                            {"score": self.score, "retry_which": kwargs['trackfile']})
                 elif event.type == gui.UI_BUTTON_PRESSED:
                     if event.ui_element == self.resume_button:
                         self.switch_pause_state()
@@ -246,19 +184,14 @@ class GameScene(scenes.Scene):
                         return scenes.MainScene(self.main_window, self.clock), [], {}
                 elif en.HIDE_TAP_EFFECT <= event.type < en.HIDE_TAP_EFFECT + PATHS:
                     self.hide_tap_effect(event.type - en.HIDE_TAP_EFFECT)
-                elif event.type == en.HOLD_EARLY_RELEASE:
-                    for s in self.notesprite[event.dict['path']][event.dict['id']]:
-                        s.image.fill((108, 108, 108))
+                elif event.type == en.DECISION:
+                    self.on_decision(event.dict['type_'], event.dict['decision'], event.dict['path'])
             if not self.paused:
-                self.gamemgr.update(self.clock.get_time())
+                self.game_renderer.update(self.clock.get_time())
             self.side_board_guimgr.update(self.clock.get_time() / 1000)
             self.pause_guimgr.update(self.clock.get_time() / 1000)
-            self.pathgroup.update(self.gamemgr.gametime)
             self.side_board_guimgr.draw_ui(self.main_window)
-            self.pathgroup.draw(self.main_window)
-            for notegroup in self.notegroups:
-                notegroup.update(self.gamemgr.gametime)
-                notegroup.draw(self.main_window)
+            self.main_window.blit(self.game_renderer.render(), (0, 0))
             self.decision_label_group.draw(self.main_window)
             self.pause_guimgr.draw_ui(self.main_window)
             pygame.display.flip()

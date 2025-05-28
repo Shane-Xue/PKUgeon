@@ -1,3 +1,4 @@
+import gamedata.track_file
 import scenes
 import pygame
 from pygame import Rect
@@ -32,10 +33,8 @@ class ChartInfoScene(scenes.Scene):
         self.best_label = gui.elements.UILabel(tr, "HI-score:", manager=self.uimgr)
 
     def main_loop(self, *args, **kwargs):
-        trackfile_name = kwargs["trackfile_name"]
+        tf = kwargs["trackfile"]
         gamescn = GameScene(self.main_window, self.clock)
-        gamescn.gamemgr.prepare(trackfile_name)
-        tf = gamescn.gamemgr.trackfile
 
         self.cover.blit(pygame.image.load(tf.cover_img_path()))
         self.title_label.set_text(f"Title: {tf.title}")
