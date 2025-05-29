@@ -19,6 +19,8 @@ class MainScene(scenes.Scene):
                                                  "Quit", manager=self.uimgr)
         self.chart_maker_button = gui.elements.UIButton(pygame.Rect((100, 300), (200, 100)),
                                                         "Chart Maker", manager=self.uimgr)
+        self.settings_button = gui.elements.UIButton(pygame.Rect((500, 100), (200, 100)),
+                                                     "Settings", manager=self.uimgr)
         self.chart_maker_button.disable()
         self.title_label = gui.elements.UILabel(pygame.Rect(WD_WID * 0.3, WD_HEI * 0.2, WD_WID * 0.4, 50),
                                                 "PKUgeon",  manager=self.uimgr)
@@ -43,6 +45,8 @@ class MainScene(scenes.Scene):
                             return None, [], {}
                         case self.chart_maker_button:
                             print("chart maker not implemented")
+                        case self.settings_button:
+                            return (scenes.SettingScene(self.main_window, self.clock), [], {})
                 self.uimgr.process_events(event)
             delta = self.clock.tick(FPS)
             for i in range(PATHS):
