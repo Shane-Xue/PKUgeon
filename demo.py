@@ -6,7 +6,7 @@ from config import *
 
 def main():
     pygame.init()
-    screen = pygame.display.set_mode((WD_WID, WD_HEI), pygame.FULLSCREEN)
+    screen = pygame.display.set_mode((WD_WID, WD_HEI), pygame.FULLSCREEN | pygame.SCALED)
     clock = pygame.time.Clock()
 
     current_scn = scenes.MainScene(screen, clock)

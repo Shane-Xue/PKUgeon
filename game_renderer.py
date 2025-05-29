@@ -84,8 +84,15 @@ class GameRenderer:
             print("post ", decision, data.type, data.path)
 
     def key_down(self, path: int, auto_op: bool = False):
-        self.gamemgr.down(path, auto_op)
+        r = self.gamemgr.down(path, auto_op)
+        if r == notedata.NoteType.TAP:
+            self.pathsprite[path].tap()
+        elif r == notedata.NoteType.HOLD:
+            self.pathsprite[path].pressed()
+        elif not auto_op:
+            self.pathsprite[path].pressed()
 
     def key_up(self, path: int, auto_op: bool = False):
-        self.gamemgr.up(path, auto_op)
+        if self.gamemgr.up(path, auto_op) or not auto_op:
+            self.pathsprite[path].released()
 

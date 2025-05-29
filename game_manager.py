@@ -40,7 +40,7 @@ class GameManager:
         # todo
 
     def down(self, path: int, auto_op: bool = False):
-        self.notemgr.down(path, auto_op)
+        return self.notemgr.down(path, auto_op)
 
     def up(self, path: int, auto_op: bool = False):
-        self.notemgr.up(path, auto_op)
+        return self.notemgr.up(path, auto_op)
