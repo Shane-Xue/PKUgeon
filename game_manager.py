@@ -2,6 +2,7 @@
 game_manager.py
 实现一系列控制游戏进程的核心逻辑
 """
+import os.path
 
 import pygame
 from pygame import event
@@ -11,6 +12,7 @@ import config
 from enum import Enum, auto
 from collections import deque
 
+from gamedata.mediaplayer import MediaPlayer
 from gamedata.track_file import TrackFile
 from note.note_manager import NoteManager
 
@@ -28,6 +30,9 @@ class GameManager:
         self.notemgr = NoteManager(self.trackfile.notes, self.gametime, self.userprofile.pre_creation_offset())
         self.duration_ms = self.trackfile.duration_ms
 
+        self.music_start = False
+        MediaPlayer.global_player.load_music(os.path.join(trackfile.path, 'music.mp3'))
+
     def update(self, delta: float):
         """
         :param delta: 距上次update经过的时间，单位为ms
@@ -37,6 +42,9 @@ class GameManager:
         self.notemgr.update(delta)
         if self.gametime >= self.duration_ms + config.GAP_TIME:
             event.post(event.Event(en.GAME_OVER))
+        if self.musictime >= 0 and not self.music_start:
+            self.music_start = True
+            event.post(event.Event(en.PLAY_MUSIC))
         # todo
 
     def down(self, path: int, auto_op: bool = False):

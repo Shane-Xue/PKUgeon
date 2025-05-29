@@ -21,7 +21,7 @@ def main():
 
 def random_generate():
     """为了测试先随机生成个谱面"""
-    trkdata = {'duration_ms': 60000, 'bpm': 60, 'title': 'RANDOM', 'artist': 'None',
+    trkdata = {'duration_ms': 60000, 'bpm': 75, 'title': 'RANDOM', 'artist': 'None',
                'chart_maker': 'Random', 'level': 12, 'notes': []}
     # 全部弄成8分好了
     t = 2000

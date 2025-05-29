@@ -28,7 +28,7 @@ class GameScene(scenes.Scene):
         self.decision_label_group = pygame.sprite.Group()
         self.decision_label: list[ColoredTextSprite] = [None for _ in range(PATHS)]
         self.delta_bar = DeltaBar()
-        self.delta_bar.rect.midbottom = WD_WID / 4, 1060
+        self.delta_bar.rect.midbottom = WD_WID / 4, 1040
         self.delta_bar_group = pygame.sprite.Group(self.delta_bar)
 
         self.side_board_guimgr = gui.UIManager((WD_WID, WD_HEI), theme_path="./res/theme/ingame.json")
@@ -101,7 +101,8 @@ class GameScene(scenes.Scene):
                 self.score.score += 5 * mult
         self.update_side_board()
         self.show_tap_effect(path, decision)
-        self.delta_bar.add_marker(Marker(), delta)
+        if decision != decision.MISS or delta < -MISS_INTERVAL:
+            self.delta_bar.add_marker(Marker(), delta)
         MediaPlayer.global_player.play_sound_effect(SEID.from_decision(decision))
 
     def on_key_down(self, key):
@@ -136,9 +137,11 @@ class GameScene(scenes.Scene):
         if self.paused:
             self.paused = False
             self.pause_menu.hide()
+            MediaPlayer.global_player.unpause()
         else:
             self.paused = True
             self.pause_menu.show()
+            MediaPlayer.global_player.pause()
 
     def show_tap_effect(self, path: int, decision_level: notedata.DecisionLevel):
         if self.decision_label[path] is not None:
@@ -180,6 +183,7 @@ class GameScene(scenes.Scene):
                 elif event.type == pygame.KEYUP:
                     self.on_key_up(event.key)
                 elif event.type == en.GAME_OVER:
+                    MediaPlayer.global_player.unload_music()
                     return (scenes.GameOverScene(self.main_window, self.clock), [],
                             {"score": self.score, "retry_which": kwargs['trackfile']})
                 elif event.type == gui.UI_BUTTON_PRESSED:
@@ -194,6 +198,9 @@ class GameScene(scenes.Scene):
                 elif event.type == en.DECISION:
                     self.on_decision(event.dict['type_'], event.dict['decision'],
                                      event.dict['path'], event.dict['delta'])
+                elif event.type == en.PLAY_MUSIC:
+                    MediaPlayer.global_player.play_music()
+                    print(1)
             if self.auto_play:
                 for i in range(PATHS):
                     self.game_renderer.key_down(i, True)

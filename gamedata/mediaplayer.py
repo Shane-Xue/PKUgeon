@@ -50,17 +50,25 @@ class MediaPlayer:
         pygame.mixer.music.load(music_file)
         self.current_music = music_file
 
+    def unload_music(self):
+        if self.current_music is not None:
+            self.current_music = None
+            pygame.mixer.music.unload()
+
     def play_music(self, loops=0):
         """
         播放音乐
-        :param loops: 循环次数，0表示无限循环
+        :param loops: 循环次数等于loop+1
         """
         if self.current_music:
             pygame.mixer.music.play(loops)
 
     def pause(self):
         """暂停音乐"""
-        # todo
+        pygame.mixer.music.pause()
+
+    def unpause(self):
+        pygame.mixer.music.unpause()
 
     def jump(self, time_ms):
         """音乐跳转到特定时间点"""
