@@ -5,6 +5,7 @@ from pygame import Rect
 import pygame_gui as gui
 import event_number as en
 from game_manager import GameManager
+from gamedata.mediaplayer import MediaPlayer, SEID
 from scenes import GameScene
 from config import *
 
@@ -43,6 +44,8 @@ class ChartInfoScene(scenes.Scene):
         self.chart_label.set_text(f"Chart: {tf.chart_maker}")
         self.level_label.set_text(f"Level: {tf.level}")
         self.best_label.set_text(f"Best: {None}")
+
+        MediaPlayer.global_player.play_sound_effect(SEID.SHOW_INFO)
 
         pygame.time.set_timer(en.EXIT_CHART_INFO, 3000, loops=1)
 

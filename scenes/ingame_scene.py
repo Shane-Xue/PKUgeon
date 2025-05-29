@@ -2,6 +2,7 @@ from pygame_gui.elements import UIButton
 
 import game_manager
 from game_renderer import GameRenderer
+from gamedata.mediaplayer import MediaPlayer, SEID
 from gamedata.user_profile import UserProfile
 from note import notedata
 import scenes
@@ -96,6 +97,7 @@ class GameScene(scenes.Scene):
                 self.score.score += 5 * mult
         self.update_side_board()
         self.show_tap_effect(path, decision)
+        MediaPlayer.global_player.play_sound_effect(SEID.from_decision(decision))
 
     def on_key_down(self, key):
         if not self.auto_play:
