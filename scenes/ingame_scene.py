@@ -13,6 +13,7 @@ from pygame_gui.elements.ui_label import UILabel
 from config import *
 import event_number as en
 from gamedata.score import Score
+from sprites.delta_bar import DeltaBar, Marker
 from sprites.tap_effect import ColoredTextSprite
 
 
@@ -25,6 +26,11 @@ class GameScene(scenes.Scene):
         self.auto_play = False
 
         self.decision_label_group = pygame.sprite.Group()
+        self.decision_label: list[ColoredTextSprite] = [None for _ in range(PATHS)]
+        self.delta_bar = DeltaBar()
+        self.delta_bar.rect.midbottom = WD_WID / 4, 1060
+        self.delta_bar_group = pygame.sprite.Group(self.delta_bar)
+
         self.side_board_guimgr = gui.UIManager((WD_WID, WD_HEI), theme_path="./res/theme/ingame.json")
         self.side_board = gui.core.UIContainer((WD_WID / 2, 0, WD_WID / 2, WD_HEI),
                                                manager=self.side_board_guimgr)
@@ -60,15 +66,13 @@ class GameScene(scenes.Scene):
         self.exit_button = UIButton(Rect(ts[0] * 0.2, ts[1] * 0.6, ts[0] * 0.6, 50), "Exit",
                                     manager=self.pause_guimgr, container=self.pause_menu)
 
-        self.decision_label: list[ColoredTextSprite] = [None for _ in range(PATHS)]
-
     def update_side_board(self):
         self.badge_label.set_text(f"{'AP' if self.score.is_ap else '  '}  {'FC+' if self.score.is_fcplus else '   '}  "
                                   f"{'FC' if self.score.is_fc else '  '}")
         self.score_label.set_text(f"SCORE: {self.score.score:>8}")
         self.combo_label.set_text(f"COMBO: {self.score.combo:>5} (MAX: {self.score.max_combo:>5})")
 
-    def on_decision(self, type_: notedata.NoteType, decision: notedata.DecisionLevel, path: int):
+    def on_decision(self, type_: notedata.NoteType, decision: notedata.DecisionLevel, path: int, delta: float):
         mult = 1 if type_ == type_.TAP else 2
         match decision:
             case notedata.DecisionLevel.MISS:
@@ -97,25 +101,22 @@ class GameScene(scenes.Scene):
                 self.score.score += 5 * mult
         self.update_side_board()
         self.show_tap_effect(path, decision)
+        self.delta_bar.add_marker(Marker(), delta)
         MediaPlayer.global_player.play_sound_effect(SEID.from_decision(decision))
 
     def on_key_down(self, key):
         if not self.auto_play:
             if key == self.userprofile.get_key('path_0'):
                 if not self.paused:
-                    print('d0')
                     self.game_renderer.key_down(0)
             elif key == self.userprofile.get_key('path_1'):
                 if not self.paused:
-                    print('d1')
                     self.game_renderer.key_down(1)
             elif key == self.userprofile.get_key('path_2'):
                 if not self.paused:
-                    print('d2')
                     self.game_renderer.key_down(2)
             elif key == self.userprofile.get_key('path_3'):
                 if not self.paused:
-                    print('d3')
                     self.game_renderer.key_down(3)
         if key == pygame.K_ESCAPE:
             self.switch_pause_state()
@@ -191,7 +192,8 @@ class GameScene(scenes.Scene):
                 elif en.HIDE_TAP_EFFECT <= event.type < en.HIDE_TAP_EFFECT + PATHS:
                     self.hide_tap_effect(event.type - en.HIDE_TAP_EFFECT)
                 elif event.type == en.DECISION:
-                    self.on_decision(event.dict['type_'], event.dict['decision'], event.dict['path'])
+                    self.on_decision(event.dict['type_'], event.dict['decision'],
+                                     event.dict['path'], event.dict['delta'])
             if self.auto_play:
                 for i in range(PATHS):
                     self.game_renderer.key_down(i, True)
@@ -202,6 +204,7 @@ class GameScene(scenes.Scene):
             self.pause_guimgr.update(self.clock.get_time() / 1000)
             self.side_board_guimgr.draw_ui(self.main_window)
             self.main_window.blit(self.game_renderer.render(), (0, 0))
+            self.delta_bar_group.draw(self.main_window)
             self.decision_label_group.draw(self.main_window)
             self.pause_guimgr.draw_ui(self.main_window)
             pygame.display.flip()

@@ -67,8 +67,8 @@ class GameRenderer:
         if data.type == notedata.NoteType.TAP:
             self.notesprite[data.path][id_].kill()
             pygame.event.post(pygame.Event(en.DECISION,
-                                           {'decision': data.decision, 'type_': data.type, 'path': data.path}))
-            print("post ", data.decision, data.type, data.path)
+                                           {'decision': data.decision, 'type_': data.type,
+                                            'path': data.path, 'delta': data.delta}))
         elif data.type == notedata.NoteType.HOLD:
             decision = data.decision
             if data.tail_decision == notedata.DecisionLevel.MISS:
@@ -80,8 +80,8 @@ class GameRenderer:
             ss = self.notesprite[data.path][id_]
             for s in ss: s.kill()
             pygame.event.post(pygame.Event(en.DECISION,
-                                           {'decision': decision, 'type_': data.type, 'path': data.path}))
-            print("post ", decision, data.type, data.path)
+                                           {'decision': decision, 'type_': data.type,
+                                            'path': data.path, 'delta': data.delta}))
 
     def key_down(self, path: int, auto_op: bool = False):
         r = self.gamemgr.down(path, auto_op)

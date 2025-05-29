@@ -45,6 +45,7 @@ class Note:
     time: float
     path: int
     decision: DecisionLevel
+    delta: float  # positive for late
 
     def __lt__(self, other):
         return self.path < other.path or (self.path == other.path and self.time < other.time)

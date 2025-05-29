@@ -9,7 +9,7 @@ WD_WID = 1920  # 主窗口宽度
 
 PATHS = 4  # 4k
 
-GAP_TIME = 5  # 进入游戏后的间隙时间
+GAP_TIME = 3000  # 进入游戏后的间隙时间
 
 FPS = 60
 

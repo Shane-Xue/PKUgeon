@@ -76,6 +76,7 @@ class NoteManager:
                 if self.notes[path][i].type == notedata.NoteType.TAP:
                     event.post(event.Event(en.DISPOSE_NOTE,
                                            {"path": path, "id": i, "notedata": self.notes[path][i]}))
+                self.notes[path][i].delta = -delta
                 return self.notes[path][i].type
         else:
             if delta > MISS_INTERVAL:
@@ -88,6 +89,7 @@ class NoteManager:
                 self.notes[path][i].decision = notedata.DecisionLevel.GOOD
             else:
                 self.notes[path][i].decision = notedata.DecisionLevel.MISS
+            self.notes[path][i].delta = -delta
             if self.notes[path][i].type == notedata.NoteType.TAP:
                 event.post(event.Event(en.DISPOSE_NOTE, {"path": path, "id": i, "notedata": self.notes[path][i]}))
 

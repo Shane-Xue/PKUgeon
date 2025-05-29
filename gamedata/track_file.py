@@ -57,14 +57,16 @@ def read_track_file(filename: str) -> TrackFile:
                 ret.notes[int(note['path'])].append(notedata.Note(notedata.NoteType.TAP,
                                                                   float(note['time']),
                                                                   int(note['path']),
-                                                                  notedata.DecisionLevel.NONE))
+                                                                  notedata.DecisionLevel.NONE,
+                                                                  0,))
             elif note['type'] == 'hold':
                 ret.notes[int(note['path'])].append(notedata.Hold(notedata.NoteType.HOLD,
                                                                   float(note['time']),
                                                                   int(note['path']),
                                                                   notedata.DecisionLevel.NONE,
                                                                   float(note['interval']),
-                                                                  notedata.DecisionLevel.NONE))
+                                                                  0,
+                                                                  notedata.DecisionLevel.NONE,))
         for i in range(PATHS):
             ret.notes[i].sort()
     return ret
