@@ -16,10 +16,13 @@ FPS = 60
 DECISION_POS = 960  # 判定线位置
 TOP_POS = 80  # note最早出现的位置
 
-HOLD_LINE_WIDTH = 10.
+HOLD_LINE_WIDTH = 10
 
 
 PERFECT_INTERVAL = 30   # ms
 GREAT_INTERVAL = 60     # ms
 GOOD_INTERVAL = 100     # ms
 MISS_INTERVAL = 200     # ms
+
+# THEME_COLOR = (0x8e, 0xc7, 0xcc)
+THEME_COLOR = (135, 178, 176)

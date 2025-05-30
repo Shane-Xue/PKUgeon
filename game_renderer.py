@@ -32,7 +32,7 @@ class GameRenderer:
 
     def render(self) -> pygame.Surface:
         ret = pygame.Surface(self.size)
-        ret.fill((0x8e, 0xc7, 0xcc))
+        ret.fill(THEME_COLOR)
         self.pathgroup.draw(ret)
         for notegroup in self.notegroups:
             notegroup.draw(ret)

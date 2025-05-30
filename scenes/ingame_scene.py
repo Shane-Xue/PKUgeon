@@ -175,7 +175,7 @@ class GameScene(scenes.Scene):
         pygame.event.clear()
 
         while going:
-            self.main_window.fill((0x8e, 0xc7, 0xcc))
+            self.main_window.fill(THEME_COLOR)
             for event in pygame.event.get():
                 self.side_board_guimgr.process_events(event)
                 self.pause_guimgr.process_events(event)
