@@ -2,10 +2,10 @@ from chartwriter import ChartWriter
 from note import notedata as nd
 import random
 
-path_dict = {'51':0, '153':1, '256':2, '358':3}
-chart = ChartWriter('test')
+path_dict = {'64':0, '192':1, '320':2, '448':3}
+chart = ChartWriter('glaciaxion')
 
-chart.create_chart(150, 66000)
+chart.create_chart(140, 167000, 158)
 with open('rawchart', 'r', encoding='utf-8') as f:
     for line in f:
         line = line.strip()
@@ -13,12 +13,12 @@ with open('rawchart', 'r', encoding='utf-8') as f:
             continue
         parts = line.split(',')
         path = path_dict[parts[0]]
-        start = int(parts[2])//100
-        if parts[3] == '1':
-            chart.add_note(nd.NoteType.TAP, start, path)
-        elif parts[3] == '128':
+        start = round((int(parts[2]) - 158)/(60000/140)) * 4
+        if parts[3] == '128':
             suffix = parts[5].split(':')
-            end = int(suffix[0])//100
+            end = round((int(suffix[0]) - 158)/(60000/140)) * 4
             chart.add_note(nd.NoteType.HOLD, start, path, end)
+        else:
+            chart.add_note(nd.NoteType.TAP, start, path)
 chart.save()
 
