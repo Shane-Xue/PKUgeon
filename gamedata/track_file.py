@@ -12,8 +12,8 @@ save_dir = 'save/trackfile'
 
 
 class TrackFile:
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, name = ""):
+        self.path = os.path.join(save_dir, name)
         self.notes: list[list[notedata.Note]] = [[] for i in range(PATHS)]
         self.title = "None"
         self.bpm = 0
@@ -43,7 +43,7 @@ class TrackFile:
 def read_track_file(filename: str) -> TrackFile:
     path = os.path.join(save_dir, filename)
     full_path = os.path.join(path, filename)
-    ret = TrackFile(path)
+    ret = TrackFile(filename)
     with open(full_path, 'r') as f:
         data = json.load(f)
         ret.title = data['title']
@@ -78,6 +78,10 @@ def write_track_file(filename: str, track_file: TrackFile):
         'duration_ms': track_file.duration_ms,
         'bpm': track_file.bpm,
         'start_time': track_file.start_time,
+        'title': track_file.title,
+        'artist': track_file.artist,
+        'chart_maker': track_file.chart_maker,
+        'level': track_file.level,
         'notes': []
     }
     for path in track_file.notes:
