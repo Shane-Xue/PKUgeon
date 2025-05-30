@@ -51,7 +51,7 @@ class SettingScene(scenes.Scene):
         self.delta_sum = 0
         self.calibrate_banned_group = [self.latency_slider, self.latency_entry, self.flow_speed_slider, self.flow_entry,
                                        self.calibrate_button, self.save_button, self.back_button] + self.key_buttons
-        self.calibrate_popup = None
+        self.calibrate_popup: gui.windows.UIMessageWindow = None
 
 
 
@@ -118,10 +118,14 @@ class SettingScene(scenes.Scene):
                         self.key_buttons[self.waiting_for_key].set_text(f"{path}: {pygame.key.name(self.original_binding[0])}")
                     self.waiting_for_key = None
                 self.uimgr.process_events(event)
-                if self.calibrate_popup is not None and self.calibrate_popup.process_event(event):
-                    self.calibrate_popup = None
-                    self.calibrating = True
-                    pygame.time.set_timer(pygame.Event(en.CALIBRATION, {'idx': 0}), 1000)
+                if self.calibrate_popup is not None:
+                    self.calibrate_popup.process_event(event)
+                    if (event.type == gui.UI_BUTTON_PRESSED
+                            and (event.ui_element == self.calibrate_popup.dismiss_button
+                                 or event.ui_element == self.calibrate_popup.close_window_button)):
+                        self.calibrate_popup = None
+                        self.calibrating = True
+                        pygame.time.set_timer(pygame.Event(en.CALIBRATION, {'idx': 0}), 1000)
                 if self.calibrating:
                     self.calibrate_process(event)
 
@@ -137,7 +141,7 @@ class SettingScene(scenes.Scene):
         self.delta_sum = 0
         self.real_time = None
         self.expected_time = None
-        self.calibrate_popup = gui.windows.UIMessageWindow(Rect(WD_WID * 0.4, WD_HEI * 0.4, WD_WID * 0.2, WD_HEI * 0.2),
+        self.calibrate_popup = gui.windows.UIMessageWindow(Rect(WD_WID * 0.3, WD_HEI * 0.3, WD_WID * 0.4, WD_HEI * 0.4),
                                                            r"Next, you will hear four sets of sounds. Each set consists of three evenly spaced 'beep' sounds. Your task is to press the key as accurately as possible when the third 'beep' occurs. For the first set, press the key corresponding to path_0; for the second set, press the key corresponding to path_1, and so on. Press the 'dismiss' button when you're ready to begin.",
                                                            self.uimgr)
 
@@ -146,7 +150,7 @@ class SettingScene(scenes.Scene):
             idx = event.dict['idx']
             if idx == 0 or idx == 1:
                 MediaPlayer.global_player.play_sound_effect(SEID.CALIBRATION)
-                pygame.time.set_timer(pygame.Event(en.CALIBRATION, {'idx': idx + 1}), 1000, 1)
+                pygame.time.set_timer(pygame.Event(en.CALIBRATION, {'idx': idx + 1}), 700, 1)
             elif idx == 2:
                 MediaPlayer.global_player.play_sound_effect(SEID.GAME_PERFECT)
                 self.expected_time = time.time() * 1000
@@ -159,7 +163,7 @@ class SettingScene(scenes.Scene):
             self.expected_time = None
             if self.calibration_round < PATHS - 1:
                 self.calibration_round += 1
-                pygame.time.set_timer(pygame.Event(en.CALIBRATION, {'idx': 0}), 2000, 1)
+                pygame.time.set_timer(pygame.Event(en.CALIBRATION, {'idx': 0}), 1400, 1)
             else:
                 self.end_calibration()
 
