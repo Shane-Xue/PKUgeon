@@ -1,7 +1,12 @@
+import gamedata.track_file
+import time
+import event_number as en
 import scenes
 import pygame
 from pygame import Rect
 import pygame_gui as gui
+
+from game_renderer import GameRenderer
 from gamedata.user_profile import UserProfile
 from gamedata.mediaplayer import MediaPlayer, SEID
 from config import *
@@ -35,16 +40,20 @@ class SettingScene(scenes.Scene):
             self.key_buttons.append(btn)
         # 辅助延迟校准
         self.calibrate_button = gui.elements.UIButton(Rect(WD_WID * 0.05, WD_HEI * 0.463, WD_WID * 0.104, WD_HEI * 0.037), "latency test", manager=self.uimgr)
-        self.calibrate_button.disable()
         self.save_button = gui.elements.UIButton(Rect(WD_WID * 0.182, WD_HEI * 0.463, WD_WID * 0.104, WD_HEI * 0.037), "save", manager=self.uimgr)
         self.back_button = gui.elements.UIButton(Rect(WD_WID * 0.313, WD_HEI * 0.463, WD_WID * 0.104, WD_HEI * 0.037), "back", manager=self.uimgr)
         self.waiting_for_key = None
-
-        # 校准相关
         self.calibrating = False
-        self.calibrate_times = []
-        self.calibrate_note_time = 0
-        self.calibrate_audio_played = False
+        self.calibration_start_time = 0
+        self.calibration_round = 0
+        self.expected_time = 0
+        self.real_time = 0
+        self.delta_sum = 0
+        self.calibrate_banned_group = [self.latency_slider, self.latency_entry, self.flow_speed_slider, self.flow_entry,
+                                       self.calibrate_button, self.save_button, self.back_button] + self.key_buttons
+        self.calibrate_popup = None
+
+
 
     def main_loop(self, *args, **kwargs):
         running = True
@@ -109,45 +118,57 @@ class SettingScene(scenes.Scene):
                         self.key_buttons[self.waiting_for_key].set_text(f"{path}: {pygame.key.name(self.original_binding[0])}")
                     self.waiting_for_key = None
                 self.uimgr.process_events(event)
-
-            # 校准逻辑
-            if self.calibrating:
-                self.update_calibration()
+                if self.calibrate_popup is not None and self.calibrate_popup.process_event(event):
+                    self.calibrate_popup = None
+                    self.calibrating = True
+                    pygame.time.set_timer(pygame.Event(en.CALIBRATION, {'idx': 0}), 1000)
+                if self.calibrating:
+                    self.calibrate_process(event)
 
             self.uimgr.update(time_delta)
             self.main_window.fill((255, 255, 255))
             self.uimgr.draw_ui(self.main_window)
-            # 校准动画
-            if self.calibrating:
-                self.draw_calibration()
             pygame.display.flip()
 
     def start_calibration(self):
-        self.calibrating = True
-        self.calibrate_times = []
-        self.calibrate_note_time = pygame.time.get_ticks()
-        self.calibrate_audio_played = False
-        MediaPlayer.global_player.play_sound_effect(SEID.GAME_PERFECT)
+        for c in self.calibrate_banned_group:
+            c.disable()
+        self.calibration_round = 0
+        self.delta_sum = 0
+        self.real_time = None
+        self.expected_time = None
+        self.calibrate_popup = gui.windows.UIMessageWindow(Rect(WD_WID * 0.4, WD_HEI * 0.4, WD_WID * 0.2, WD_HEI * 0.2),
+                                                           r"Next, you will hear four sets of sounds. Each set consists of three evenly spaced 'beep' sounds. Your task is to press the key as accurately as possible when the third 'beep' occurs. For the first set, press the key corresponding to path_0; for the second set, press the key corresponding to path_1, and so on. Press the 'dismiss' button when you're ready to begin.",
+                                                           self.uimgr)
 
-    def update_calibration(self):
-        now = pygame.time.get_ticks()
-        if not self.calibrate_audio_played and now - self.calibrate_note_time > 500:
-            MediaPlayer.global_player.play_sound_effect(SEID.GAME_PERFECT)
-            self.calibrate_audio_played = True
-        keys = pygame.key.get_pressed()
-        if any(keys[self.profile.get_key(f'path_{i}')] for i in range(4)):
-            hit_time = now - self.calibrate_note_time
-            self.calibrate_times.append(hit_time)
-            if len(self.calibrate_times) >= 5:
-                avg = sum(self.calibrate_times) / len(self.calibrate_times)
-                self.profile.latency = int(avg - 500)
-                self.calibrating = False
+    def calibrate_process(self, event: pygame.event.Event):
+        if event.type == en.CALIBRATION:
+            idx = event.dict['idx']
+            if idx == 0 or idx == 1:
+                MediaPlayer.global_player.play_sound_effect(SEID.CALIBRATION)
+                pygame.time.set_timer(pygame.Event(en.CALIBRATION, {'idx': idx + 1}), 1000, 1)
+            elif idx == 2:
+                MediaPlayer.global_player.play_sound_effect(SEID.GAME_PERFECT)
+                self.expected_time = time.time() * 1000
+        elif event.type == pygame.KEYDOWN:
+            if event.key == self.profile.get_key(f"path_{self.calibration_round}"):
+                self.real_time = time.time() * 1000
+        if self.real_time is not None and self.expected_time is not None:
+            self.delta_sum += self.real_time - self.expected_time
+            self.real_time = None
+            self.expected_time = None
+            if self.calibration_round < PATHS - 1:
+                self.calibration_round += 1
+                pygame.time.set_timer(pygame.Event(en.CALIBRATION, {'idx': 0}), 2000, 1)
+            else:
+                self.end_calibration()
 
-    def draw_calibration(self):
-        h = WD_HEI
-        w = WD_WID
-        pygame.draw.line(self.main_window, (0, 0, 0), (w//2-w*0.052, h-h*0.093), (w//2+w*0.052, h-h*0.093), 5)
-        now = pygame.time.get_ticks()
-        t = min((now - self.calibrate_note_time) / 500, 1.0)
-        y = int((h-h*0.463) * t + h*0.093)
-        pygame.draw.circle(self.main_window, (0, 128, 255), (w//2, y), int(w*0.016))
+    def end_calibration(self):
+        for c in self.calibrate_banned_group:
+            c.enable()
+        value = self.delta_sum / PATHS
+        self.profile.latency = value
+        self.latency_entry.set_text(str(value))
+        self.latency_slider.set_current_value(value)
+        self.calibrating = False
+

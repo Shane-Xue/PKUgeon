@@ -4,14 +4,17 @@ from sprites.abstract import AbstractNoteSprite
 
 
 class HoldLineSprite(AbstractNoteSprite):
+    normal_color = (120, 93, 97)
+    grayed_color = (102, 102, 102)
 
     def __init__(self, start_note: pygame.sprite.Sprite, end_note: pygame.sprite.Sprite,
                  decision_time, length):
         super().__init__(decision_time, None)
+        self.color = self.normal_color
         self.start_note = start_note
         self.end_note = end_note
         self.image = pygame.surface.Surface((HOLD_LINE_WIDTH, length))
-        self.image.fill((120, 93, 97))
+        self.image.fill(self.color)
         self.rect = self.image.get_rect()
 
     def update(self, gametime):
@@ -19,7 +22,7 @@ class HoldLineSprite(AbstractNoteSprite):
         if self.rect.height > 0:
             self.rect.midtop = self.end_note.rect.midbottom
             self.image = pygame.surface.Surface((HOLD_LINE_WIDTH, self.rect.height))
-            self.image.fill((120, 93, 97))
+            self.image.fill(self.color)
         else:
             self.image = pygame.surface.Surface((0, 0))
 

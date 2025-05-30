@@ -10,6 +10,7 @@ class SEID(IntEnum):
     GAME_GREAT = auto()
     GAME_GOOD = auto()
     GAME_MISS = auto()
+    CALIBRATION = auto()
 
     @staticmethod
     def from_decision(decision: DecisionLevel):

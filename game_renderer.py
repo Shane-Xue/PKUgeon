@@ -51,7 +51,9 @@ class GameRenderer:
             self.dispose_note_sprite(event.dict['notedata'], event.dict['id'])
         elif event.type == en.HOLD_EARLY_RELEASE:
             s = self.notesprite[event.dict['path']][event.dict['id']]
-            s[2].image.fill((108, 108, 108))
+            s[0].image = s[0].grayed_holdimg
+            s[1].image = s[1].grayed_holdimg
+            s[2].color = s[2].grayed_color
 
     def create_note_sprite(self, data: notedata.Note, id_):
         if data.type == notedata.NoteType.TAP:
@@ -60,7 +62,9 @@ class GameRenderer:
             self.notegroups[data.path].add(ntap)
         elif data.type == notedata.NoteType.HOLD:
             nt1 = HoldStartNoteSprite(data.time, DECISION_POS, self.tap_calc_midbottom, self.pathsprite[data.path])
+            nt1.image = nt1.holdimg
             nt2 = TapNoteSprite(data.time + data.interval, self.tap_calc_midbottom, self.pathsprite[data.path])
+            nt2.image = nt2.holdimg
             nl = HoldLineSprite(nt1, nt2, data.time, self.holdline_calc_length(data.interval))
             self.notesprite[data.path][id_] = nt1, nt2, nl
             self.notegroups[data.path].add(nt1, nt2, nl)

@@ -5,6 +5,8 @@ from sprites.abstract import AbstractNoteSprite
 
 class TapNoteSprite(AbstractNoteSprite):
     tapimg = pygame.image.load("./res/img/tap.png")
+    holdimg = pygame.image.load("./res/img/hold.png")
+    grayed_holdimg = pygame.image.load("./res/img/hold_gray.png")
 
     def __init__(self, decision_time, fn_calc_midbottom, parent: pygame.sprite.Sprite = None):
         super().__init__(decision_time, fn_calc_midbottom, parent)
@@ -19,9 +21,11 @@ class TapNoteSprite(AbstractNoteSprite):
         return f
 
 
+
 class HoldStartNoteSprite(TapNoteSprite):
     def __init__(self, decision_time, bottom_pos, fn_calc_midbottom, parent: pygame.sprite.Sprite = None):
         super().__init__(decision_time, fn_calc_midbottom, parent)
+        self.image = self.holdimg
         self.bottom_pos = bottom_pos
 
     def update(self, gametime):
