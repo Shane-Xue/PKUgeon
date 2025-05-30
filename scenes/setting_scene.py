@@ -9,23 +9,23 @@ from config import *
 class SettingScene(scenes.Scene):
     def __init__(self, main_window: pygame.Surface, clock: pygame.time.Clock):
         super().__init__(main_window, clock)
-        self.uimgr = gui.UIManager((WD_WID, WD_HEI))
+        self.uimgr = gui.UIManager((WD_WID, WD_HEI), theme_path='res/theme/setting.json')
         self.profile = UserProfile()
         # 延迟说明与滑块
         self.latency_label = gui.elements.UILabel(
-            Rect(100, 70, 80, 30), "latency(ms):", self.uimgr)
+            Rect(100, 70, 120, 30), "latency(ms):", self.uimgr)
         self.latency_slider = gui.elements.UIHorizontalSlider(
-            Rect(190, 100, 210, 40), self.profile.latency, (-200, 200), self.uimgr)
+            Rect(240, 100, 210, 40), self.profile.latency, (-200, 200), self.uimgr)
         self.latency_entry = gui.elements.UITextEntryLine(
-            Rect(410, 100, 60, 40), self.uimgr)
+            Rect(500, 100, 60, 40), self.uimgr)
         self.latency_entry.set_text(str(self.profile.latency))
         # 流速说明与滑块
         self.flow_label = gui.elements.UILabel(
-            Rect(100, 130, 80, 30), "flow speed:", self.uimgr)
+            Rect(100, 130, 120, 30), "flow speed:", self.uimgr)
         self.flow_speed_slider = gui.elements.UIHorizontalSlider(
-            Rect(190, 160, 210, 40), self.profile.flow_speed, (1, 10), self.uimgr)
+            Rect(240, 160, 210, 40), self.profile.flow_speed, (1, 10), self.uimgr)
         self.flow_entry = gui.elements.UITextEntryLine(
-            Rect(410, 160, 60, 40), self.uimgr)
+            Rect(500, 160, 60, 40), self.uimgr)
         self.flow_entry.set_text(str(self.profile.flow_speed))
         # 键位绑定按钮
         self.key_buttons = []
