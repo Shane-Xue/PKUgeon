@@ -27,25 +27,25 @@ class GameScene(scenes.Scene):
         self.decision_label_group = pygame.sprite.Group()
         self.decision_label: list[ColoredTextSprite] = [None for _ in range(PATHS)]
         self.delta_bar = DeltaBar()
-        self.delta_bar.rect.midbottom = WD_WID / 4, 1040
+        self.delta_bar.rect.midbottom = WD_WID / 4, WD_HEI - 40
         self.delta_bar_group = pygame.sprite.Group(self.delta_bar)
 
         self.side_board_guimgr = gui.UIManager((WD_WID, WD_HEI), theme_path="./res/theme/ingame.json")
         self.side_board = gui.core.UIContainer((WD_WID / 2, 0, WD_WID / 2, WD_HEI),
-                                               manager=self.side_board_guimgr)
-        self.badge_label = UILabel(pygame.Rect((100, 100), (WD_WID / 2 - 100, 100)),
-                                   "AP FC+ FC",
-                                   manager=self.side_board_guimgr,
-                                   container=self.side_board)
-        self.score_label = UILabel(pygame.Rect((100, 250), (WD_WID / 2 - 100, 100)),
-                                   "SCORE:",
-                                   manager=self.side_board_guimgr,
-                                   container=self.side_board)
+                               manager=self.side_board_guimgr)
+        self.badge_label = UILabel(pygame.Rect((WD_WID * 0.052, WD_HEI * 0.093), (WD_WID * 0.396, WD_HEI * 0.093)),
+                       "AP FC+ FC",
+                       manager=self.side_board_guimgr,
+                       container=self.side_board)
+        self.score_label = UILabel(pygame.Rect((WD_WID * 0.052, WD_HEI * 0.231), (WD_WID * 0.396, WD_HEI * 0.093)),
+                       "SCORE:",
+                       manager=self.side_board_guimgr,
+                       container=self.side_board)
         self.score_label.set_text_scale(100)
-        self.combo_label = UILabel(pygame.Rect((100, 400), (WD_WID / 2 - 100, 100)),
-                                   "COMBO:",
-                                   manager=self.side_board_guimgr,
-                                   container=self.side_board)
+        self.combo_label = UILabel(pygame.Rect((WD_WID * 0.052, WD_HEI * 0.37), (WD_WID * 0.396, WD_HEI * 0.093)),
+                       "COMBO:",
+                       manager=self.side_board_guimgr,
+                       container=self.side_board)
         self.score = Score()
         self.score.max_score = 1
         self.update_side_board()
