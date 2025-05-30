@@ -37,7 +37,10 @@ class ChartInfoScene(scenes.Scene):
         tf = kwargs["trackfile"]
         gamescn = GameScene(self.main_window, self.clock)
 
-        self.cover.blit(pygame.image.load(tf.cover_img_path()))
+        # 加载并缩放封面图片到固定大小
+        cover_img = pygame.image.load(tf.cover_img_path()).convert_alpha()
+        cover_img = pygame.transform.smoothscale(cover_img, (540, 540))
+        self.cover.blit(cover_img, (0, 0))
         self.title_label.set_text(f"Title: {tf.title}")
         self.bpm_label.set_text(f"BPM: {tf.bpm}")
         self.artist_label.set_text(f"Artist: {tf.artist}")
