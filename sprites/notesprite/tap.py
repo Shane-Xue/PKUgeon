@@ -8,10 +8,7 @@ class TapNoteSprite(AbstractNoteSprite):
 
     def __init__(self, decision_time, fn_calc_midbottom, parent: pygame.sprite.Sprite = None):
         super().__init__(decision_time, fn_calc_midbottom, parent)
-        # self.image = TapNoteSprite.tapimg
-        # self.rect = self.image.get_rect()
-        self.image = pygame.Surface((120, 40))
-        self.image.fill((0, 162, 232))
+        self.image = TapNoteSprite.tapimg
         self.rect = self.image.get_rect()
 
     @staticmethod

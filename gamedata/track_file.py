@@ -21,6 +21,7 @@ class TrackFile:
         self.chart_maker = "None"
         self.level = 0
         self.duration_ms = 0
+        self.max_score = 0
         self.start_time = 0  # 记录谱面开始时间，单位为ms，在此基础上加减latency
 
     def add(self, note):
@@ -54,12 +55,14 @@ def read_track_file(filename: str) -> TrackFile:
         ret.bpm = int(data['bpm'])
         for note in data['notes']:
             if note['type'] == 'tap':
+                ret.max_score += 10
                 ret.notes[int(note['path'])].append(notedata.Note(notedata.NoteType.TAP,
                                                                   float(note['time']),
                                                                   int(note['path']),
                                                                   notedata.DecisionLevel.NONE,
                                                                   0,))
             elif note['type'] == 'hold':
+                ret.max_score += 20
                 ret.notes[int(note['path'])].append(notedata.Hold(notedata.NoteType.HOLD,
                                                                   float(note['time']),
                                                                   int(note['path']),

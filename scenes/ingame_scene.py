@@ -1,6 +1,5 @@
 from pygame_gui.elements import UIButton
 
-import game_manager
 from game_renderer import GameRenderer
 from gamedata.mediaplayer import MediaPlayer, SEID
 from gamedata.user_profile import UserProfile
@@ -28,26 +27,27 @@ class GameScene(scenes.Scene):
         self.decision_label_group = pygame.sprite.Group()
         self.decision_label: list[ColoredTextSprite] = [None for _ in range(PATHS)]
         self.delta_bar = DeltaBar()
-        self.delta_bar.rect.midbottom = WD_WID / 4, 1040
+        self.delta_bar.rect.midbottom = WD_WID / 4, WD_HEI - 40
         self.delta_bar_group = pygame.sprite.Group(self.delta_bar)
 
         self.side_board_guimgr = gui.UIManager((WD_WID, WD_HEI), theme_path="./res/theme/ingame.json")
         self.side_board = gui.core.UIContainer((WD_WID / 2, 0, WD_WID / 2, WD_HEI),
-                                               manager=self.side_board_guimgr)
-        self.badge_label = UILabel(pygame.Rect((100, 100), (WD_WID / 2 - 100, 100)),
-                                   "AP FC+ FC",
-                                   manager=self.side_board_guimgr,
-                                   container=self.side_board)
-        self.score_label = UILabel(pygame.Rect((100, 250), (WD_WID / 2 - 100, 100)),
-                                   "SCORE:",
-                                   manager=self.side_board_guimgr,
-                                   container=self.side_board)
+                               manager=self.side_board_guimgr)
+        self.badge_label = UILabel(pygame.Rect((WD_WID * 0.052, WD_HEI * 0.093), (WD_WID * 0.396, WD_HEI * 0.093)),
+                       "AP FC+ FC",
+                       manager=self.side_board_guimgr,
+                       container=self.side_board)
+        self.score_label = UILabel(pygame.Rect((WD_WID * 0.052, WD_HEI * 0.231), (WD_WID * 0.396, WD_HEI * 0.093)),
+                       "SCORE:",
+                       manager=self.side_board_guimgr,
+                       container=self.side_board)
         self.score_label.set_text_scale(100)
-        self.combo_label = UILabel(pygame.Rect((100, 400), (WD_WID / 2 - 100, 100)),
-                                   "COMBO:",
-                                   manager=self.side_board_guimgr,
-                                   container=self.side_board)
+        self.combo_label = UILabel(pygame.Rect((WD_WID * 0.052, WD_HEI * 0.37), (WD_WID * 0.396, WD_HEI * 0.093)),
+                       "COMBO:",
+                       manager=self.side_board_guimgr,
+                       container=self.side_board)
         self.score = Score()
+        self.score.max_score = 1
         self.update_side_board()
 
         self.paused = False
@@ -69,8 +69,10 @@ class GameScene(scenes.Scene):
     def update_side_board(self):
         self.badge_label.set_text(f"{'AP' if self.score.is_ap else '  '}  {'FC+' if self.score.is_fcplus else '   '}  "
                                   f"{'FC' if self.score.is_fc else '  '}")
-        self.score_label.set_text(f"SCORE: {self.score.score:>8}")
-        self.combo_label.set_text(f"COMBO: {self.score.combo:>5} (MAX: {self.score.max_combo:>5})")
+        t = self.score.score / self.score.max_score * 100
+        self.score_label.set_text(f"SCORE: {self.score.score:0>8} "
+                                  f"({'0' if t < 100 else ''}{'0' if t < 10 else ''}{t:3.6f}%)")
+        self.combo_label.set_text(f"COMBO: {self.score.combo:0>5} (MAX: {self.score.max_combo:0>5})")
 
     def on_decision(self, type_: notedata.NoteType, decision: notedata.DecisionLevel, path: int, delta: float):
         mult = 1 if type_ == type_.TAP else 2
@@ -164,14 +166,16 @@ class GameScene(scenes.Scene):
             self.decision_label[path] = None
 
     def main_loop(self, *args, **kwargs) -> tuple[scenes.Scene | None, list, dict]:
-        self.game_renderer = GameRenderer(self.userprofile, kwargs['trackfile'])
+        trackfile = kwargs['trackfile']
+        self.score.max_score = trackfile.max_score
+        self.game_renderer = GameRenderer(self.userprofile, trackfile)
 
         going = True
 
         pygame.event.clear()
 
         while going:
-            self.main_window.fill((255, 255, 255))
+            self.main_window.fill((0x8e, 0xc7, 0xcc))
             for event in pygame.event.get():
                 self.side_board_guimgr.process_events(event)
                 self.pause_guimgr.process_events(event)

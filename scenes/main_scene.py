@@ -15,15 +15,15 @@ class MainScene(scenes.Scene):
         self.songname = "supernova"
 
         self.uimgr = gui.UIManager((WD_WID, WD_HEI))
-
-        self.start_button = gui.elements.UIButton(pygame.Rect((100, 100), (200, 100)),
-                                                  "Start", manager=self.uimgr)
-        self.exit_button = gui.elements.UIButton(pygame.Rect((100, 500), (200, 100)),
-                                                 "Quit", manager=self.uimgr)
-        self.chart_maker_button = gui.elements.UIButton(pygame.Rect((100, 300), (200, 100)),
-                                                        "Chart Maker", manager=self.uimgr)
-        self.settings_button = gui.elements.UIButton(pygame.Rect((500, 100), (200, 100)),
-                                                     "Settings", manager=self.uimgr)
+        
+        self.start_button = gui.elements.UIButton(pygame.Rect((WD_WID * 0.05, WD_HEI * 0.09), (WD_WID * 0.1, WD_HEI * 0.09)),
+                      "Start", manager=self.uimgr)
+        self.exit_button = gui.elements.UIButton(pygame.Rect((WD_WID * 0.05, WD_HEI * 0.46), (WD_WID * 0.1, WD_HEI * 0.09)),
+                     "Quit", manager=self.uimgr)
+        self.chart_maker_button = gui.elements.UIButton(pygame.Rect((WD_WID * 0.05, WD_HEI * 0.28), (WD_WID * 0.1, WD_HEI * 0.09)),
+                    "Chart Maker", manager=self.uimgr)
+        self.settings_button = gui.elements.UIButton(pygame.Rect((WD_WID * 0.26, WD_HEI * 0.09), (WD_WID * 0.1, WD_HEI * 0.09)),
+                     "Settings", manager=self.uimgr)
         self.chart_maker_button.disable()
         self.title_label = gui.elements.UILabel(pygame.Rect(WD_WID * 0.3, WD_HEI * 0.2, WD_WID * 0.4, 50),
                                                 "PKUgeon",  manager=self.uimgr)
@@ -57,7 +57,7 @@ class MainScene(scenes.Scene):
                 self.demo.key_up(i, True)
             self.uimgr.update(delta / 1000)
             self.demo.update(delta)
-            self.main_window.fill((255, 255, 255))
+            self.main_window.fill((0x8e, 0xc7, 0xcc))
             self.main_window.blit(self.demo.render(), (WD_WID / 2, 0))
             self.uimgr.draw_ui(self.main_window)
 
