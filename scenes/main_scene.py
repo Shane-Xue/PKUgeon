@@ -11,6 +11,9 @@ from gamedata.user_profile import UserProfile
 class MainScene(scenes.Scene):
     def __init__(self, main_window: pygame.Surface, clock: pygame.Clock):
         super().__init__(main_window, clock)
+        # TODO
+        self.songname = "supernova"
+
         self.uimgr = gui.UIManager((WD_WID, WD_HEI))
 
         self.start_button = gui.elements.UIButton(pygame.Rect((100, 100), (200, 100)),
@@ -25,7 +28,7 @@ class MainScene(scenes.Scene):
         self.title_label = gui.elements.UILabel(pygame.Rect(WD_WID * 0.3, WD_HEI * 0.2, WD_WID * 0.4, 50),
                                                 "PKUgeon",  manager=self.uimgr)
 
-        self.demo = GameRenderer(UserProfile(), gamedata.track_file.read_track_file('test'))
+        self.demo = GameRenderer(UserProfile(), gamedata.track_file.read_track_file(self.songname))
         self.demo_over = False
 
     def main_loop(self, *args, **kwargs) -> tuple[scenes.Scene | None, list, dict]:
@@ -40,7 +43,7 @@ class MainScene(scenes.Scene):
                     match event.ui_element:
                         case self.start_button:
                             return (scenes.ChartInfoScene(self.main_window, self.clock), [],
-                                    {'trackfile': gamedata.track_file.read_track_file('test')})
+                                    {'trackfile': gamedata.track_file.read_track_file(self.songname)})
                         case self.exit_button:
                             return None, [], {}
                         case self.chart_maker_button:
