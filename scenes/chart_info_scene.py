@@ -51,7 +51,6 @@ class ChartInfoScene(scenes.Scene):
         tr.bottom = WD_HEI - margin_bottom
         
         profile = UserProfile()
-        print(profile.key_bindings)
         key_letters = ' '.join(binding[1].split('_')[1].upper() for binding in profile.key_bindings.values())
         key_text = f"Track keys: {key_letters}"
         self.key_label = gui.elements.UILabel(
