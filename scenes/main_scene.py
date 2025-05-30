@@ -54,7 +54,7 @@ class MainScene(scenes.Scene):
                 self.demo.key_up(i, True)
             self.uimgr.update(delta / 1000)
             self.demo.update(delta)
-            self.main_window.fill((255, 255, 255))
+            self.main_window.fill((0x8e, 0xc7, 0xcc))
             self.main_window.blit(self.demo.render(), (WD_WID / 2, 0))
             self.uimgr.draw_ui(self.main_window)
 
