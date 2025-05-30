@@ -25,7 +25,7 @@ class MainScene(scenes.Scene):
         self.title_label = gui.elements.UILabel(pygame.Rect(WD_WID * 0.3, WD_HEI * 0.2, WD_WID * 0.4, 50),
                                                 "PKUgeon",  manager=self.uimgr)
 
-        self.demo = GameRenderer(UserProfile(), gamedata.track_file.read_track_file('demo'))
+        self.demo = GameRenderer(UserProfile(), gamedata.track_file.read_track_file('test'))
         self.demo_over = False
 
     def main_loop(self, *args, **kwargs) -> tuple[scenes.Scene | None, list, dict]:
@@ -40,7 +40,7 @@ class MainScene(scenes.Scene):
                     match event.ui_element:
                         case self.start_button:
                             return (scenes.ChartInfoScene(self.main_window, self.clock), [],
-                                    {'trackfile': gamedata.track_file.read_track_file('demo')})
+                                    {'trackfile': gamedata.track_file.read_track_file('test')})
                         case self.exit_button:
                             return None, [], {}
                         case self.chart_maker_button:
