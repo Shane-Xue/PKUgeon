@@ -8,6 +8,7 @@ from game_manager import GameManager
 from gamedata.mediaplayer import MediaPlayer, SEID
 from scenes import GameScene
 from config import *
+from gamedata.user_profile import UserProfile
 
 
 class ChartInfoScene(scenes.Scene):
@@ -38,6 +39,28 @@ class ChartInfoScene(scenes.Scene):
         self.level_label = gui.elements.UILabel(tr, "Level:", manager=self.uimgr)
         tr.midleft = (label_x, int(WD_HEI * 0.7778))  # 840/1080
         self.best_label = gui.elements.UILabel(tr, "HI-score:", manager=self.uimgr)
+        
+        
+        # Add keybinding bar at the bottom
+        bar_width = int(WD_WID * 0.6)  # 60% of window width
+        bar_height = int(WD_HEI * 0.05)  # 5% of window height
+        margin_bottom = int(WD_HEI * 0.03)  # 3% margin from bottom
+        
+        tr = Rect(0, 0, bar_width, bar_height)
+        tr.centerx = WD_WID // 2
+        tr.bottom = WD_HEI - margin_bottom
+        
+        profile = UserProfile()
+        print(profile.key_bindings)
+        key_letters = ' '.join(binding[1].split('_')[1].upper() for binding in profile.key_bindings.values())
+        key_text = f"Track keys: {key_letters}"
+        self.key_label = gui.elements.UILabel(
+            tr, 
+            key_text,
+            manager=self.uimgr,
+            object_id="#hint"
+        )
+        self.key_label.rebuild()
 
     def main_loop(self, *args, **kwargs):
         tf = kwargs["trackfile"]
