@@ -86,6 +86,8 @@ class SettingScene(scenes.Scene):
                     if event.ui_element in self.key_buttons:
                         idx = self.key_buttons.index(event.ui_element)
                         self.waiting_for_key = idx
+                        # Store the original key binding
+                        self.original_binding = self.profile.key_bindings[f'path_{idx}']
                         self.key_buttons[idx].set_text("Press the new key...")
                     elif event.ui_element == self.calibrate_button:
                         self.start_calibration()
@@ -97,8 +99,14 @@ class SettingScene(scenes.Scene):
                 if self.waiting_for_key is not None and event.type == pygame.KEYDOWN:
                     path = f'path_{self.waiting_for_key}'
                     keyname = pygame.key.name(event.key)
-                    self.profile.key_bindings[path] = [getattr(pygame, "K_" + keyname), "K_" + keyname]
-                    self.key_buttons[self.waiting_for_key].set_text(f"{path}: {keyname}")
+                    # Check if keyname is a single letter
+                    if len(keyname) == 1:
+                        self.profile.key_bindings[path] = [getattr(pygame, "K_" + keyname), "K_" + keyname]
+                        self.key_buttons[self.waiting_for_key].set_text(f"{path}: {keyname}")
+                    else:
+                        # Restore original binding
+                        self.profile.key_bindings[path] = self.original_binding
+                        self.key_buttons[self.waiting_for_key].set_text(f"{path}: {pygame.key.name(self.original_binding[0])}")
                     self.waiting_for_key = None
                 self.uimgr.process_events(event)
 
