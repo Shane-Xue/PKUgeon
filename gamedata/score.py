@@ -10,6 +10,7 @@ class Score:
     combo: int = 0
     max_combo: int = 0
     score: int = 0
+    max_score: int = 0
     is_ap: bool = True
     is_fcplus: bool = True
     is_fc: bool = True

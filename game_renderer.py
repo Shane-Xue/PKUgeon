@@ -5,6 +5,7 @@ from gamedata.track_file import TrackFile
 from gamedata.user_profile import UserProfile
 from note import notedata
 from sprites.abstract import AbstractNoteSprite
+from sprites.decision_line import DecisionLine
 from sprites.notesprite.hold import HoldLineSprite
 from sprites.notesprite.tap import TapNoteSprite, HoldStartNoteSprite
 from sprites.path import PathSprite
@@ -14,9 +15,10 @@ import event_number as en
 class GameRenderer:
     def __init__(self, userprofile: UserProfile, trackfile: TrackFile):
         self.gamemgr = game_manager.GameManager(userprofile, trackfile)
-
+        self.decision_line = DecisionLine()
         self.pathsprite = [PathSprite(i) for i in range(PATHS)]
         self.pathgroup = pygame.sprite.Group(self.pathsprite)
+        self.pathgroup.add(self.decision_line)
         self.notesprite: list[dict[int, AbstractNoteSprite | tuple]] = [{} for i in range(PATHS)]
         self.notegroups = [pygame.sprite.Group() for _ in range(PATHS)]
         self.tap_calc_midbottom = TapNoteSprite.gen_default_fn(self.gamemgr.userprofile.flow_speed,
@@ -30,7 +32,7 @@ class GameRenderer:
 
     def render(self) -> pygame.Surface:
         ret = pygame.Surface(self.size)
-        ret.fill((255, 255, 255))
+        ret.fill((0x8e, 0xc7, 0xcc))
         self.pathgroup.draw(ret)
         for notegroup in self.notegroups:
             notegroup.draw(ret)
@@ -48,8 +50,8 @@ class GameRenderer:
         elif event.type == en.DISPOSE_NOTE:
             self.dispose_note_sprite(event.dict['notedata'], event.dict['id'])
         elif event.type == en.HOLD_EARLY_RELEASE:
-            for s in self.notesprite[event.dict['path']][event.dict['id']]:
-                s.image.fill((108, 108, 108))
+            s = self.notesprite[event.dict['path']][event.dict['id']]
+            s[2].image.fill((108, 108, 108))
 
     def create_note_sprite(self, data: notedata.Note, id_):
         if data.type == notedata.NoteType.TAP:

@@ -42,7 +42,9 @@ class GameOverScene(scenes.Scene):
         self.goods_label.set_text(f"Goods: {score.goods}")
         self.misses_label.set_text(f"Misses: {score.misses}")
         self.maxcombo_label.set_text(f"Max Combo: {score.max_combo}")
-        self.score_label.set_text(f"Score: {score.score}")
+        t = score.score / score.max_score * 100
+        self.score_label.set_text(f"SCORE: {score.score:0>8} "
+                                  f"({'0' if t < 100 else ''}{'0' if t < 10 else ''}{t:3.6f}%)")
 
         going = True
 
