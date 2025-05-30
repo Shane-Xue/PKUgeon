@@ -12,15 +12,15 @@ class MainScene(scenes.Scene):
     def __init__(self, main_window: pygame.Surface, clock: pygame.Clock):
         super().__init__(main_window, clock)
         self.uimgr = gui.UIManager((WD_WID, WD_HEI))
-
-        self.start_button = gui.elements.UIButton(pygame.Rect((100, 100), (200, 100)),
-                                                  "Start", manager=self.uimgr)
-        self.exit_button = gui.elements.UIButton(pygame.Rect((100, 500), (200, 100)),
-                                                 "Quit", manager=self.uimgr)
-        self.chart_maker_button = gui.elements.UIButton(pygame.Rect((100, 300), (200, 100)),
-                                                        "Chart Maker", manager=self.uimgr)
-        self.settings_button = gui.elements.UIButton(pygame.Rect((500, 100), (200, 100)),
-                                                     "Settings", manager=self.uimgr)
+        
+        self.start_button = gui.elements.UIButton(pygame.Rect((WD_WID * 0.05, WD_HEI * 0.09), (WD_WID * 0.1, WD_HEI * 0.09)),
+                      "Start", manager=self.uimgr)
+        self.exit_button = gui.elements.UIButton(pygame.Rect((WD_WID * 0.05, WD_HEI * 0.46), (WD_WID * 0.1, WD_HEI * 0.09)),
+                     "Quit", manager=self.uimgr)
+        self.chart_maker_button = gui.elements.UIButton(pygame.Rect((WD_WID * 0.05, WD_HEI * 0.28), (WD_WID * 0.1, WD_HEI * 0.09)),
+                    "Chart Maker", manager=self.uimgr)
+        self.settings_button = gui.elements.UIButton(pygame.Rect((WD_WID * 0.26, WD_HEI * 0.09), (WD_WID * 0.1, WD_HEI * 0.09)),
+                     "Settings", manager=self.uimgr)
         self.chart_maker_button.disable()
         self.title_label = gui.elements.UILabel(pygame.Rect(WD_WID * 0.3, WD_HEI * 0.2, WD_WID * 0.4, 50),
                                                 "PKUgeon",  manager=self.uimgr)

@@ -16,21 +16,27 @@ class ChartInfoScene(scenes.Scene):
         super().__init__(main_window, clock)
 
         self.uimgr = gui.UIManager(main_window.size, theme_path='res/theme/chartinfo.json')
-        self.cover = pygame.Surface((540, 540))
+        cover_size = int(WD_HEI * 0.5)  # 540 is 0.5 of 1080
+        self.cover = pygame.Surface((cover_size, cover_size))
         self.cover_rect = self.cover.get_rect()
-        self.cover_rect.topleft = 360, 180
-        tr = Rect(0, 0, 360, 50)
-        tr.midleft = (1200, 240)
+        self.cover_rect.topleft = (int(WD_WID * 0.1875), int(WD_HEI * 0.1667))  # 360/1920, 180/1080
+
+        label_width = int(WD_WID * 0.1875)  # 360/1920
+        label_height = int(WD_HEI * 0.0463)  # 50/1080
+        tr = Rect(0, 0, label_width, label_height)
+        
+        label_x = int(WD_WID * 0.625)  # 1200/1920
+        tr.midleft = (label_x, int(WD_HEI * 0.2222))  # 240/1080
         self.title_label = gui.elements.UILabel(tr, "Title:", manager=self.uimgr)
-        tr.midleft = (1200, 360)
+        tr.midleft = (label_x, int(WD_HEI * 0.3333))  # 360/1080
         self.bpm_label = gui.elements.UILabel(tr, "BPM:", manager=self.uimgr)
-        tr.midleft = (1200, 480)
+        tr.midleft = (label_x, int(WD_HEI * 0.4444))  # 480/1080
         self.artist_label = gui.elements.UILabel(tr, "Artist:", manager=self.uimgr)
-        tr.midleft = (1200, 600)
+        tr.midleft = (label_x, int(WD_HEI * 0.5556))  # 600/1080
         self.chart_label = gui.elements.UILabel(tr, "Chart:", manager=self.uimgr)
-        tr.midleft = (1200, 720)
+        tr.midleft = (label_x, int(WD_HEI * 0.6667))  # 720/1080
         self.level_label = gui.elements.UILabel(tr, "Level:", manager=self.uimgr)
-        tr.midleft = (1200, 840)
+        tr.midleft = (label_x, int(WD_HEI * 0.7778))  # 840/1080
         self.best_label = gui.elements.UILabel(tr, "HI-score:", manager=self.uimgr)
 
     def main_loop(self, *args, **kwargs):
