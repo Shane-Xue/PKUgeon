@@ -30,6 +30,9 @@ class MainScene(scenes.Scene):
 
         self.demo = GameRenderer(UserProfile(), gamedata.track_file.read_track_file(self.songname))
         self.demo_over = False
+        
+        pygame.display.set_caption("PKUgeon")
+        pygame.display.set_icon(pygame.image.load("./res/img/PKUGeon.png"))
 
     def main_loop(self, *args, **kwargs) -> tuple[scenes.Scene | None, list, dict]:
         going = True
