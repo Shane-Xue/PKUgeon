@@ -22,7 +22,7 @@ class ChartInfoScene(scenes.Scene):
         self.cover_rect = self.cover.get_rect()
         self.cover_rect.topleft = (int(WD_WID * 0.1875), int(WD_HEI * 0.1667))  # 360/1920, 180/1080
 
-        label_width = int(WD_WID * 0.1875)  # 360/1920
+        label_width = int(WD_WID * 0.2)  # 360/1920
         label_height = int(WD_HEI * 0.0463)  # 50/1080
         tr = Rect(0, 0, label_width, label_height)
         

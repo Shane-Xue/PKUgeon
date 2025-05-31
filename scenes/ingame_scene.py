@@ -207,7 +207,6 @@ class GameScene(scenes.Scene):
                                      event.dict['path'], event.dict['delta'])
                 elif event.type == en.PLAY_MUSIC:
                     MediaPlayer.global_player.play_music()
-                    print(1)
             if self.auto_play:
                 for i in range(PATHS):
                     self.game_renderer.key_down(i, True)

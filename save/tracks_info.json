@@ -1,0 +1,21 @@
+{
+    "tracks": [
+        {
+            "file_name": "glaciaxion",
+            "title": "Glaciaxion",
+            "artist": "SunsetRay",
+            "bpm": "140",
+            "chart_maker": "Barbarianerman",
+            "duration": "167000"
+        },
+        {
+            "file_name": "supernova",
+            "title": "Supernova",
+            "artist": "BACO",
+            "bpm": "150",
+            "chart_maker": "東超新星",
+            "duration": "66000"
+        }
+    ],
+    "cache_time": "2025-05-31 12:09:25"
+}
