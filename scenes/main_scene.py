@@ -14,7 +14,7 @@ class MainScene(scenes.Scene):
     def __init__(self, main_window: pygame.Surface, clock: pygame.Clock):
         super().__init__(main_window, clock)
         # TODO
-        self.songname = "glaciaxion"
+        self.songname = "demo" #  截短版本，录demo用
 
         self.uimgr = gui.UIManager((WD_WID, WD_HEI), theme_path='res/theme/main.json')
 
