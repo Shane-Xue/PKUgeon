@@ -13,7 +13,7 @@ with open('rawchart', 'r', encoding='utf-8') as f:
             continue
         parts = line.split(',')
         path = path_dict[parts[0]]
-        start = round((int(parts[2]) - 158)/(60000/140)) * 4
+        start = round((int(parts[2]) - 158)/(60000/140) * 4)
         if parts[3] == '128':
             suffix = parts[5].split(':')
             end = round((int(suffix[0]) - 158)/(60000/140)) * 4
