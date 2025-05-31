@@ -1,5 +1,7 @@
 import pygame
 from enum import IntEnum, auto
+
+from gamedata.user_profile import UserProfile
 from note.notedata import DecisionLevel
 
 
@@ -33,7 +35,10 @@ class MediaPlayer:
 
     @staticmethod
     def init():
+        profile = UserProfile()
         MediaPlayer.global_player = MediaPlayer()
+        MediaPlayer.global_player.set_music_volume(profile.music_volume / 100)
+        MediaPlayer.global_player.set_sfx_volume(profile.sfx_volume / 100)
 
     def __init__(self):
         pygame.mixer.init()
@@ -77,3 +82,10 @@ class MediaPlayer:
 
     def play_sound_effect(self, seid: SEID):
         self.sound_effects[seid].play()
+
+    def set_music_volume(self, volume):
+        pygame.mixer.music.set_volume(volume / 100)
+
+    def set_sfx_volume(self, volume):
+        for seid in SEID:
+            self.sound_effects[seid].set_volume(volume / 100)

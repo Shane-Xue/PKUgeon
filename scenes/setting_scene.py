@@ -11,37 +11,69 @@ from gamedata.user_profile import UserProfile
 from gamedata.mediaplayer import MediaPlayer, SEID
 from config import *
 
+
 class SettingScene(scenes.Scene):
     def __init__(self, main_window: pygame.Surface, clock: pygame.time.Clock):
         super().__init__(main_window, clock)
         self.uimgr = gui.UIManager((WD_WID, WD_HEI), theme_path='res/theme/setting.json')
         self.profile = UserProfile()
+        # 声音
+        self.music_volume_label = gui.elements.UILabel(
+            Rect(WD_WID * 0.05, WD_HEI * 0.065, WD_WID * 0.06, WD_HEI * 0.028),
+            "music", self.uimgr
+        )
+        self.music_volume_slider = gui.elements.UIHorizontalSlider(
+            Rect(WD_WID * 0.125, WD_HEI * 0.093, WD_WID * 0.11, WD_HEI * 0.037),
+            self.profile.music_volume, (0, 100), self.uimgr
+        )
+        self.music_volume_entry = gui.elements.UITextEntryLine(
+            Rect(WD_WID * 0.26, WD_HEI * 0.093, WD_WID * 0.031, WD_HEI * 0.037), self.uimgr
+        )
+        self.music_volume_entry.set_text(str(self.profile.music_volume))
+        self.sfx_volume_label = gui.elements.UILabel(
+            Rect(WD_WID * 0.05, WD_HEI * 0.12, WD_WID * 0.06, WD_HEI * 0.028),
+            "sound effects", self.uimgr
+        )
+        self.sfx_volume_slider = gui.elements.UIHorizontalSlider(
+            Rect(WD_WID * 0.125, WD_HEI * 0.148, WD_WID * 0.11, WD_HEI * 0.037),
+            self.profile.sfx_volume, (0, 100), self.uimgr
+        )
+        self.sfx_volume_entry = gui.elements.UITextEntryLine(
+            Rect(WD_WID * 0.26, WD_HEI * 0.148, WD_WID * 0.031, WD_HEI * 0.037), self.uimgr
+        )
+        self.sfx_volume_entry.set_text(str(self.profile.sfx_volume))
         # 延迟说明与滑块
         self.latency_label = gui.elements.UILabel(
-            Rect(WD_WID * 0.05, WD_HEI * 0.065, WD_WID * 0.06, WD_HEI * 0.028), "latency(ms):", self.uimgr)
+            Rect(WD_WID * 0.05, WD_HEI * 0.185, WD_WID * 0.06, WD_HEI * 0.028), "latency(ms):", self.uimgr)
         self.latency_slider = gui.elements.UIHorizontalSlider(
-            Rect(WD_WID * 0.125, WD_HEI * 0.093, WD_WID * 0.11, WD_HEI * 0.037), self.profile.latency, (-200, 200), self.uimgr)
+            Rect(WD_WID * 0.125, WD_HEI * 0.213, WD_WID * 0.11, WD_HEI * 0.037), self.profile.latency, (-200, 200),
+            self.uimgr)
         self.latency_entry = gui.elements.UITextEntryLine(
-            Rect(WD_WID * 0.26, WD_HEI * 0.093, WD_WID * 0.031, WD_HEI * 0.037), self.uimgr)
+            Rect(WD_WID * 0.26, WD_HEI * 0.213, WD_WID * 0.031, WD_HEI * 0.037), self.uimgr)
         self.latency_entry.set_text(str(self.profile.latency))
         # 流速说明与滑块
         self.flow_label = gui.elements.UILabel(
-            Rect(WD_WID * 0.05, WD_HEI * 0.12, WD_WID * 0.06, WD_HEI * 0.028), "flow speed:", self.uimgr)
+            Rect(WD_WID * 0.05, WD_HEI * 0.24, WD_WID * 0.06, WD_HEI * 0.028), "flow speed:", self.uimgr)
         self.flow_speed_slider = gui.elements.UIHorizontalSlider(
-            Rect(WD_WID * 0.125, WD_HEI * 0.148, WD_WID * 0.11, WD_HEI * 0.037), self.profile.flow_speed, (1, 10), self.uimgr)
+            Rect(WD_WID * 0.125, WD_HEI * 0.268, WD_WID * 0.11, WD_HEI * 0.037), self.profile.flow_speed, (1, 10),
+            self.uimgr)
         self.flow_entry = gui.elements.UITextEntryLine(
-            Rect(WD_WID * 0.26, WD_HEI * 0.148, WD_WID * 0.031, WD_HEI * 0.037), self.uimgr)
+            Rect(WD_WID * 0.26, WD_HEI * 0.268, WD_WID * 0.031, WD_HEI * 0.037), self.uimgr)
         self.flow_entry.set_text(str(self.profile.flow_speed))
         # 键位绑定按钮
         self.key_buttons = []
         for i, path in enumerate(['path_0', 'path_1', 'path_2', 'path_3']):
-            btn = gui.elements.UIButton(Rect(WD_WID * 0.05, WD_HEI * 0.204 + i * WD_HEI * 0.056, WD_WID * 0.104, WD_HEI * 0.037),
-                                        f"{path}: {pygame.key.name(self.profile.get_key(path))}", manager=self.uimgr)
+            btn = gui.elements.UIButton(
+                Rect(WD_WID * 0.05, WD_HEI * 0.324 + i * WD_HEI * 0.056, WD_WID * 0.104, WD_HEI * 0.037),
+                f"{path}: {pygame.key.name(self.profile.get_key(path))}", manager=self.uimgr)
             self.key_buttons.append(btn)
         # 辅助延迟校准
-        self.calibrate_button = gui.elements.UIButton(Rect(WD_WID * 0.05, WD_HEI * 0.463, WD_WID * 0.104, WD_HEI * 0.037), "latency test", manager=self.uimgr)
-        self.save_button = gui.elements.UIButton(Rect(WD_WID * 0.182, WD_HEI * 0.463, WD_WID * 0.104, WD_HEI * 0.037), "save", manager=self.uimgr)
-        self.back_button = gui.elements.UIButton(Rect(WD_WID * 0.313, WD_HEI * 0.463, WD_WID * 0.104, WD_HEI * 0.037), "back", manager=self.uimgr)
+        self.calibrate_button = gui.elements.UIButton(
+            Rect(WD_WID * 0.05, WD_HEI * 0.583, WD_WID * 0.104, WD_HEI * 0.037), "latency test", manager=self.uimgr)
+        self.save_button = gui.elements.UIButton(Rect(WD_WID * 0.182, WD_HEI * 0.583, WD_WID * 0.104, WD_HEI * 0.037),
+                                                 "save", manager=self.uimgr)
+        self.back_button = gui.elements.UIButton(Rect(WD_WID * 0.313, WD_HEI * 0.583, WD_WID * 0.104, WD_HEI * 0.037),
+                                                 "back", manager=self.uimgr)
         self.waiting_for_key = None
         self.calibrating = False
         self.calibration_start_time = 0
@@ -52,8 +84,6 @@ class SettingScene(scenes.Scene):
         self.calibrate_banned_group = [self.latency_slider, self.latency_entry, self.flow_speed_slider, self.flow_entry,
                                        self.calibrate_button, self.save_button, self.back_button] + self.key_buttons
         self.calibrate_popup: gui.windows.UIMessageWindow = None
-
-
 
     def main_loop(self, *args, **kwargs):
         running = True
@@ -69,27 +99,59 @@ class SettingScene(scenes.Scene):
                         self.profile.latency = value
                         self.latency_entry.set_text(str(value))
                     elif event.ui_element == self.flow_speed_slider:
-                        value = float(self.flow_speed_slider.get_current_value())
+                        value = int(float(self.flow_speed_slider.get_current_value()) * 10) / 10
                         self.profile.flow_speed = value
                         self.flow_entry.set_text(str(value))
+                    elif event.ui_element == self.music_volume_slider:
+                        value = int(self.music_volume_slider.get_current_value())
+                        self.profile.music_volume = value
+                        self.music_volume_entry.set_text(str(value))
+                        MediaPlayer.global_player.set_music_volume(value)
+                    elif event.ui_element == self.sfx_volume_slider:
+                        value = int(self.sfx_volume_slider.get_current_value())
+                        self.profile.sfx_volume = value
+                        self.sfx_volume_entry.set_text(str(value))
+                        MediaPlayer.global_player.set_sfx_volume(value)
                 # 输入框同步到滑块
                 if event.type == gui.UI_TEXT_ENTRY_FINISHED:
                     if event.ui_element == self.latency_entry:
                         try:
                             value = int(self.latency_entry.get_text())
-                            value = max(-200, min(200, value))
-                            self.profile.latency = value
-                            self.latency_slider.set_current_value(value)
                         except ValueError:
-                            pass
+                            value = int(self.profile.latency)
+                        value = max(-200, min(200, value))
+                        self.latency_entry.set_text(str(value))
+                        self.profile.latency = value
+                        self.latency_slider.set_current_value(value)
                     elif event.ui_element == self.flow_entry:
                         try:
-                            value = float(self.flow_entry.get_text())
-                            value = max(1, min(10, value))
-                            self.profile.flow_speed = value
-                            self.flow_speed_slider.set_current_value(value)
+                            value = int(float(self.flow_entry.get_text()) * 10) / 10
                         except ValueError:
-                            pass
+                            value = float(self.profile.latency)
+                        value = max(1, min(10, value))
+                        self.flow_entry.set_text(str(value))
+                        self.profile.flow_speed = value
+                        self.flow_speed_slider.set_current_value(value)
+                    elif event.ui_element == self.music_volume_entry:
+                        try:
+                            value = int(self.music_volume_entry.get_text())
+                        except ValueError:
+                            value = int(self.profile.music_volume)
+                        value = max(0, min(100, value))
+                        self.music_volume_entry.set_text(str(value))
+                        self.profile.music_volume = value
+                        self.music_volume_slider.set_current_value(value)
+                        MediaPlayer.global_player.set_music_volume(value)
+                    elif event.ui_element == self.sfx_volume_entry:
+                        try:
+                            value = int(self.sfx_volume_entry.get_text())
+                        except ValueError:
+                            value = int(self.profile.sfx_volume)
+                        value = max(0, min(100, value))
+                        self.sfx_volume_entry.set_text(str(value))
+                        self.profile.sfx_volume = value
+                        self.sfx_volume_slider.set_current_value(value)
+                        MediaPlayer.global_player.set_sfx_volume(value)
                 # 处理键位绑定
                 if event.type == gui.UI_BUTTON_PRESSED:
                     if event.ui_element in self.key_buttons:
@@ -115,7 +177,8 @@ class SettingScene(scenes.Scene):
                     else:
                         # Restore original binding
                         self.profile.key_bindings[path] = self.original_binding
-                        self.key_buttons[self.waiting_for_key].set_text(f"{path}: {pygame.key.name(self.original_binding[0])}")
+                        self.key_buttons[self.waiting_for_key].set_text(
+                            f"{path}: {pygame.key.name(self.original_binding[0])}")
                     self.waiting_for_key = None
                 self.uimgr.process_events(event)
                 if self.calibrate_popup is not None:
@@ -130,7 +193,7 @@ class SettingScene(scenes.Scene):
                     self.calibrate_process(event)
 
             self.uimgr.update(time_delta)
-            self.main_window.fill((255, 255, 255))
+            self.main_window.fill(THEME_COLOR)
             self.uimgr.draw_ui(self.main_window)
             pygame.display.flip()
 
@@ -141,7 +204,7 @@ class SettingScene(scenes.Scene):
         self.delta_sum = 0
         self.real_time = None
         self.expected_time = None
-        self.calibrate_popup = gui.windows.UIMessageWindow(Rect(WD_WID * 0.3, WD_HEI * 0.3, WD_WID * 0.4, WD_HEI * 0.4),
+        self.calibrate_popup = gui.windows.UIMessageWindow(Rect(WD_WID * 0.38, WD_HEI * 0.38, WD_WID * 0.24, WD_HEI * 0.24),
                                                            r"Next, you will hear four sets of sounds. Each set consists of three evenly spaced 'beep' sounds. Your task is to press the key as accurately as possible when the third 'beep' occurs. For the first set, press the key corresponding to path_0; for the second set, press the key corresponding to path_1, and so on. Press the 'dismiss' button when you're ready to begin.",
                                                            self.uimgr)
 
@@ -175,4 +238,3 @@ class SettingScene(scenes.Scene):
         self.latency_entry.set_text(str(value))
         self.latency_slider.set_current_value(value)
         self.calibrating = False
-

@@ -81,7 +81,7 @@ class ChartInfoScene(scenes.Scene):
         pygame.time.set_timer(en.EXIT_CHART_INFO, 3000, loops=1)
 
         while True:
-            self.main_window.fill((255, 255, 255))
+            self.main_window.fill(THEME_COLOR)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return None, [], {}

@@ -20,11 +20,13 @@ class UserProfile:
     
     def __init__(self):
         with open('save/user_profile.json', 'r') as file:
-            proflie = json.load(file)
-            self.flow_speed = proflie['flow_speed']
-            self.latency = proflie['latency']
+            profile: dict = json.load(file)
+            self.flow_speed = profile.get('flow_speed', 5)
+            self.latency = profile.get('latency', 0)
+            self.music_volume = profile.get('music_volume', 100)
+            self.sfx_volume = profile.get('sfx_volume', 100)
             self.key_bindings = {}
-            for action, key in proflie['key_bindings'].items():
+            for action, key in profile['key_bindings'].items():
                 self.key_bindings[action] = [getattr(pygame, key), key]
 
     def get_key(self, action: str):
@@ -44,6 +46,8 @@ class UserProfile:
             json.dump({
                 'flow_speed': self.flow_speed,
                 'latency': self.latency,
+                'music_volume': self.music_volume,
+                'sfx_volume': self.sfx_volume,
                 'key_bindings': {action: key[1] for action, key in self.key_bindings.items()}
             }, f, indent=4)
 

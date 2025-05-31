@@ -170,6 +170,9 @@ class GameScene(scenes.Scene):
         self.score.max_score = trackfile.max_score
         self.game_renderer = GameRenderer(self.userprofile, trackfile)
 
+        MediaPlayer.global_player.set_music_volume(self.userprofile.music_volume)
+        MediaPlayer.global_player.set_sfx_volume(self.userprofile.sfx_volume)
+
         going = True
 
         pygame.event.clear()

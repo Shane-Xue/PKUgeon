@@ -14,7 +14,7 @@ class MainScene(scenes.Scene):
     def __init__(self, main_window: pygame.Surface, clock: pygame.Clock):
         super().__init__(main_window, clock)
         # TODO
-        self.songname = "glaciaxion"
+        self.songname = "supernova"
 
         self.uimgr = gui.UIManager((WD_WID, WD_HEI), theme_path='res/theme/main.json')
 
@@ -40,6 +40,10 @@ class MainScene(scenes.Scene):
         self.demo_over = False
 
     def main_loop(self, *args, **kwargs) -> tuple[scenes.Scene | None, list, dict]:
+        profile = UserProfile()
+        MediaPlayer.global_player.set_music_volume(profile.music_volume)
+        MediaPlayer.global_player.set_sfx_volume(profile.sfx_volume)
+
         going = True
 
         while going:

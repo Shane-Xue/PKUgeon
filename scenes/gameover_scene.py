@@ -61,7 +61,7 @@ class GameOverScene(scenes.Scene):
                             return scenes.MainScene(self.main_window, self.clock), [], {}
                 self.uimgr.process_events(event)
             delta = self.clock.tick(FPS)
-            self.main_window.fill((255, 255, 255))
+            self.main_window.fill(THEME_COLOR)
             self.uimgr.update(delta / 1000)
             self.uimgr.draw_ui(self.main_window)
 
