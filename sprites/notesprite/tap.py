@@ -4,9 +4,9 @@ from sprites.abstract import AbstractNoteSprite
 
 
 class TapNoteSprite(AbstractNoteSprite):
-    tapimg = pygame.image.load("./res/img/tap.png")
-    holdimg = pygame.image.load("./res/img/hold.png")
-    grayed_holdimg = pygame.image.load("./res/img/hold_gray.png")
+    tapimg = pygame.image.load(resource_path("./res/img/tap.png"))
+    holdimg = pygame.image.load(resource_path("./res/img/hold.png"))
+    grayed_holdimg = pygame.image.load(resource_path("./res/img/hold_gray.png"))
 
     def __init__(self, decision_time, fn_calc_midbottom, parent: pygame.sprite.Sprite = None):
         super().__init__(decision_time, fn_calc_midbottom, parent)

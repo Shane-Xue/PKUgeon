@@ -15,7 +15,7 @@ from config import *
 class SettingScene(scenes.Scene):
     def __init__(self, main_window: pygame.Surface, clock: pygame.time.Clock):
         super().__init__(main_window, clock)
-        self.uimgr = gui.UIManager((WD_WID, WD_HEI), theme_path='res/theme/setting.json')
+        self.uimgr = gui.UIManager((WD_WID, WD_HEI), theme_path=resource_path('res/theme/setting.json'))
         self.profile = UserProfile()
         # 声音
         self.music_volume_label = gui.elements.UILabel(

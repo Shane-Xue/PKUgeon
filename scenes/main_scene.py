@@ -1,3 +1,5 @@
+import os.path
+
 import pygame
 import pygame_gui as gui
 
@@ -14,9 +16,10 @@ class MainScene(scenes.Scene):
     def __init__(self, main_window: pygame.Surface, clock: pygame.Clock):
         super().__init__(main_window, clock)
         # TODO
-        self.songname = "demo" #  截短版本，录demo用
+        self.songname = "glaciaxion" #  截短版本，录demo用
 
-        self.uimgr = gui.UIManager((WD_WID, WD_HEI), theme_path='res/theme/main.json')
+        self.uimgr = gui.UIManager((WD_WID, WD_HEI),
+                                   theme_path=resource_path('res/theme/main.json'))
 
         self.start_button = gui.elements.UIButton(
             pygame.Rect((WD_WID * 0.05, WD_HEI * 0.44), (WD_WID * 0.1, WD_HEI * 0.09)),
@@ -33,14 +36,14 @@ class MainScene(scenes.Scene):
         self.chart_maker_button.disable()
         self.title_label = gui.elements.UILabel(pygame.Rect(WD_WID * 0.05, WD_HEI * 0.18, WD_WID * 0.4, 100),
                                                 "PKUgeon: Music Game", manager=self.uimgr)
-        self.title_img = pygame.image.load('res/img/title.png')
+        self.title_img = pygame.image.load(resource_path('res/img/title.png'))
         self.title_img = pygame.transform.scale(self.title_img, (600, 700))
 
         self.demo = GameRenderer(UserProfile(), gamedata.track_file.read_track_file(self.songname))
         self.demo_over = False
 
         pygame.display.set_caption("PKUgeon")
-        pygame.display.set_icon(pygame.image.load("./res/img/PKUGeon.png"))
+        pygame.display.set_icon(pygame.image.load(resource_path('res/img/PKUGeon.png')))
 
     def main_loop(self, *args, **kwargs) -> tuple[scenes.Scene | None, list, dict]:
         profile = UserProfile()

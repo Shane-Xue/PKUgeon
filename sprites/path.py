@@ -6,8 +6,8 @@ from config import *
 
 
 class PathSprite(pygame.sprite.Sprite):
-    unpressed_img = pygame.image.load("./res/img/path.png")
-    pressed_img = pygame.image.load("./res/img/path_hl.png")
+    unpressed_img = pygame.image.load(resource_path("./res/img/path.png"))
+    pressed_img = pygame.image.load(resource_path("./res/img/path_hl.png"))
 
     def __init__(self, pathid: int):
         super().__init__()

@@ -1,3 +1,5 @@
+import os
+
 import gamedata.track_file
 import scenes
 import pygame
@@ -16,7 +18,8 @@ class ChartInfoScene(scenes.Scene):
     def __init__(self, main_window: pygame.Surface, clock: pygame.time.Clock):
         super().__init__(main_window, clock)
 
-        self.uimgr = gui.UIManager(main_window.size, theme_path='res/theme/chartinfo.json')
+        self.uimgr = gui.UIManager(main_window.size,
+                                   theme_path=resource_path('res/theme/gameover.json'))
         cover_size = int(WD_HEI * 0.5)  # 540 is 0.5 of 1080
         self.cover = pygame.Surface((cover_size, cover_size))
         self.cover_rect = self.cover.get_rect()

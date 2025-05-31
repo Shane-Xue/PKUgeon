@@ -1,6 +1,6 @@
 import pygame
 from enum import IntEnum, auto
-
+from config import *
 from gamedata.user_profile import UserProfile
 from note.notedata import DecisionLevel
 
@@ -45,7 +45,7 @@ class MediaPlayer:
         MediaPlayer.global_player = self
         self.sound_effects: dict[SEID, pygame.mixer.Sound] = {}
         for seid in SEID:
-            self.sound_effects[seid] = pygame.Sound(f'res/se/{seid.name}.wav')
+            self.sound_effects[seid] = pygame.Sound(resource_path(f'res/se/{seid.name}.wav'))
         self.current_music = None
 
     def load_music(self, music_file):

@@ -1,3 +1,5 @@
+import os.path
+
 import scenes
 import pygame
 import pygame_gui as gui
@@ -8,7 +10,8 @@ from gamedata.score import Score
 class GameOverScene(scenes.Scene):
     def __init__(self, main_window: pygame.Surface, clock: pygame.Clock):
         super().__init__(main_window, clock)
-        self.uimgr = gui.UIManager((WD_WID, WD_HEI), theme_path="./res/theme/gameover.json")
+        self.uimgr = gui.UIManager((WD_WID, WD_HEI),
+                                   theme_path=resource_path('res/theme/gameover.json'))
         layout_rect = pygame.Rect(0, 0, WD_WID * 0.8, 50)
         layout_rect.center = (WD_WID * 0.5, WD_HEI * 0.2)
         self.badge_label = gui.elements.UILabel(layout_rect, "", self.uimgr)
