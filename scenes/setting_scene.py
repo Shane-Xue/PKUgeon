@@ -233,7 +233,7 @@ class SettingScene(scenes.Scene):
     def end_calibration(self):
         for c in self.calibrate_banned_group:
             c.enable()
-        value = self.delta_sum / PATHS
+        value = int(self.delta_sum / PATHS * 10) / 10
         self.profile.latency = value
         self.latency_entry.set_text(str(value))
         self.latency_slider.set_current_value(value)
