@@ -16,7 +16,7 @@ with open('rawchart', 'r', encoding='utf-8') as f:
         start = round((int(parts[2]) - 158)/(60000/140) * 4)
         if parts[3] == '128':
             suffix = parts[5].split(':')
-            end = round((int(suffix[0]) - 158)/(60000/140)) * 4
+            end = round((int(suffix[0]) - 158)/(60000/140) * 4)
             chart.add_note(nd.NoteType.HOLD, start, path, end)
         else:
             chart.add_note(nd.NoteType.TAP, start, path)
