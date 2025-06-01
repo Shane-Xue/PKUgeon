@@ -24,7 +24,7 @@ class GameScene(scenes.Scene):
         self.userprofile = UserProfile()
         self.game_renderer = None
 
-        self.auto_play = False
+        self.auto_play = True
 
         self.decision_label_group = pygame.sprite.Group()
         self.decision_label: list[ColoredTextSprite] = [None for _ in range(PATHS)]
