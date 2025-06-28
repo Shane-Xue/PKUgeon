@@ -102,3 +102,5 @@ class GameRenderer:
         if self.gamemgr.up(path, auto_op) or not auto_op:
             self.pathsprite[path].released()
 
+    def get_time(self):
+        return (self.gamemgr.gametime, self.gamemgr.duration_ms)

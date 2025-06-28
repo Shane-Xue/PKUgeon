@@ -16,6 +16,7 @@ import event_number as en
 from gamedata.score import Score
 from sprites.delta_bar import DeltaBar, Marker
 from sprites.tap_effect import ColoredTextSprite
+from sprites.progress_bar import ProgressBar
 
 
 class GameScene(scenes.Scene):
@@ -28,9 +29,13 @@ class GameScene(scenes.Scene):
 
         self.decision_label_group = pygame.sprite.Group()
         self.decision_label: list[ColoredTextSprite] = [None for _ in range(PATHS)]
+        
         self.delta_bar = DeltaBar()
         self.delta_bar.rect.midbottom = WD_WID / 4, WD_HEI - 40
         self.delta_bar_group = pygame.sprite.Group(self.delta_bar)
+        
+        self.progress_bar = ProgressBar(self.main_window, 5)
+        
         self.side_board_guimgr = gui.UIManager((WD_WID, WD_HEI),
                                                theme_path=resource_path('res/theme/ingame.json'))
         self.side_board = gui.core.UIContainer((WD_WID / 2, 0, WD_WID / 2, WD_HEI),
@@ -222,6 +227,7 @@ class GameScene(scenes.Scene):
             self.main_window.blit(self.game_renderer.render(), (0, 0))
             self.delta_bar_group.draw(self.main_window)
             self.decision_label_group.draw(self.main_window)
+            self.progress_bar.update_bar(self.game_renderer.get_time())
             self.pause_guimgr.draw_ui(self.main_window)
             pygame.display.flip()
             self.clock.tick(FPS)

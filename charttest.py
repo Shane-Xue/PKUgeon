@@ -1,4 +1,4 @@
-from chartwriter import ChartWriter
+from utils.chartwriter import ChartWriter
 from note import notedata as nd
 import random
 
