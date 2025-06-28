@@ -1,0 +1,18 @@
+{
+    "button":
+    {
+        "colours":
+        {
+            "normal_text": "#cccccc",
+            "text_shadow": "#505050"
+        },
+        "font":
+        {
+            "size": "35"
+        },
+        "misc":
+        {
+            "text_horiz_alignment": "left"
+        }
+    }
+}

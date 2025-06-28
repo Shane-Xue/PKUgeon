@@ -24,6 +24,7 @@ class TrackInfoGetter:
                 metadata["bpm"] = str(data.get("bpm", ""))
                 metadata["chart_maker"] = data.get("chart_maker", "")
                 metadata["duration"] = str(data.get("duration_ms", ""))
+                metadata['level'] = data.get("level", "0?")
         except Exception as e:
             print(f"Error reading {file_path}: {str(e)}")
             
