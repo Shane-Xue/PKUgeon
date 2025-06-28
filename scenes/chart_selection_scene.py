@@ -13,8 +13,8 @@ class ChartSelectionScene(Scene):
         super().__init__(main_window, clock)
 
         self.uimgr = gui.UIManager((WD_WID, WD_HEI), theme_path='res/theme/chart_selection.json')
-        self.back_button = gui.elements.UIButton(pygame.Rect(0.05 * WD_WID, 0.05 * WD_HEI, 0.1 * WD_WID, 0.1 * WD_HEI),
-                                                 'back')
+        self.back_button = gui.elements.UIButton(pygame.Rect(0.05 * WD_WID, 0.90 * WD_HEI, 0.05 * WD_WID, 0.05 * WD_HEI),
+                 'Back', self.uimgr, object_id='#centered_button')
         self.selection_container = gui.elements.UIScrollingContainer(
             pygame.Rect(0.5 * WD_WID, 0.1 * WD_HEI, 0.45 * WD_WID, 0.8 * WD_HEI),
             self.uimgr,
@@ -42,11 +42,20 @@ class ChartSelectionScene(Scene):
                 if event.type == pygame.QUIT:
                     return None, [], {}
                 elif event.type == gui.UI_BUTTON_PRESSED:
-                    if selected == event.ui_element:
+                    if event.ui_element == self.back_button:
+                        return scenes.MainScene(self.main_window, self.clock), [], {}
+                    if event.ui_element == selected: # Second Click
                         return scenes.GameScene(self.main_window, self.clock), [], \
                             {'trackfile': read_track_file(event.ui_element.text_kwargs['file_name'])}
-                    else:
+                    else: # First Click
+                        print(event.ui_element.colours.keys())
+                        if selected is not None:
+                            selected.unselect()
                         selected = event.ui_element
+                        event.ui_element.select()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        return scenes.MainScene(self.main_window, self.clock), [], {}
             delta = self.clock.tick(FPS)
             self.uimgr.update(delta / 1000)
             self.main_window.fill(THEME_COLOR)
