@@ -19,12 +19,12 @@ from sprites.tap_effect import ColoredTextSprite
 
 
 class GameScene(scenes.Scene):
-    def __init__(self, main_window: pygame.Surface, clock: pygame.Clock):
+    def __init__(self, main_window: pygame.Surface, clock: pygame.Clock, auto_play: bool = False):
         super().__init__(main_window, clock)
         self.userprofile = UserProfile()
         self.game_renderer = None
 
-        self.auto_play = True
+        self.auto_play = auto_play
 
         self.decision_label_group = pygame.sprite.Group()
         self.decision_label: list[ColoredTextSprite] = [None for _ in range(PATHS)]
