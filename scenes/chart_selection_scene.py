@@ -1,5 +1,6 @@
 import pygame
 import pygame_gui as gui
+import pygame.mixer
 
 import scenes
 from gamedata.track_file import read_track_file
@@ -34,6 +35,7 @@ class ChartSelectionScene(Scene):
             ) for i, track in enumerate(self.charts_lst)
         ]
         self.initialize_chart_info()
+        self.drumbeat = pygame.mixer.Sound('res/sound/cali.ogg')
         
     
     def initialize_chart_info(self):
@@ -127,23 +129,35 @@ class ChartSelectionScene(Scene):
         self.title_value.set_text(track['title'] or "Unknown")
         self.artist_value.set_text(track['artist'] or "Unknown")
     
-    def begin(self, selected):
+    def begin_play(self, selected):
+        self.on_exit()
         return scenes.GameScene(self.main_window, self.clock, self.auto_checkbox.is_selected), [], \
                             {'trackfile': read_track_file(selected.text_kwargs['file_name'])}
+    
+    
+    def main_menu(self):
+        self.on_exit()
+        return scenes.MainScene(self.main_window, self.clock), [], {}
+        
+    def on_exit(self):
+        self.drumbeat.stop()
         
     def main_loop(self, *args, **kwargs) -> tuple[Scene | None, list, dict]:
         going = True
         selected = None
+        
+        self.drumbeat.play(-1)
 
         while going:
             for event in pygame.event.get():
                 self.uimgr.process_events(event)
                 self.info_mgr.process_events(event)
                 if event.type == pygame.QUIT:
+                    self.on_exit()
                     return None, [], {}
                 elif event.type == gui.UI_BUTTON_PRESSED:
                     if event.ui_element == self.back_button:
-                        return scenes.MainScene(self.main_window, self.clock), [], {}
+                        return self.main_menu()
                     elif event.ui_element == self.auto_checkbox:
                         if self.auto_checkbox.is_selected:
                             self.auto_checkbox.unselect()
@@ -154,7 +168,7 @@ class ChartSelectionScene(Scene):
                             self.auto_checkbox.set_text("Autoplay On")
                             print("Autoplay On")
                     elif event.ui_element == selected or event.ui_element == self.play_button: # Second Click
-                        return self.begin(selected)
+                        return self.begin_play(selected)
                     else: # First Click
                         if selected is not None:
                             selected.unselect()
@@ -162,7 +176,7 @@ class ChartSelectionScene(Scene):
                         event.ui_element.select()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        return scenes.MainScene(self.main_window, self.clock), [], {}
+                        return self.main_menu()
                     elif event.key == pygame.K_UP:
                         if selected is None:
                             selected = self.charts[-1]  # Start from bottom if nothing selected
@@ -182,7 +196,7 @@ class ChartSelectionScene(Scene):
                             selected = self.charts[track_id]
                         selected.select()
                     elif event.key == pygame.K_RETURN and selected is not None:
-                        return self.begin(selected)
+                        return self.begin_play(selected)
             delta = self.clock.tick(FPS)
             self.uimgr.update(delta / 1000)
             self.main_window.fill(THEME_COLOR)
