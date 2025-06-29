@@ -20,6 +20,19 @@ class DecisionLevel(Enum):
     GREAT = auto()
     PERFECT = auto()
 
+    def __str__(self):
+        match self:
+            case self.NONE:
+                return ""
+            case self.MISS:
+                return "Miss"
+            case self.GOOD:
+                return "Good"
+            case self.GREAT:
+                return "Great"
+            case self.PERFECT:
+                return "Perfect"
+
 
 @dataclass
 class Note:
@@ -32,6 +45,7 @@ class Note:
     time: float
     path: int
     decision: DecisionLevel
+    delta: float  # positive for late
 
     def __lt__(self, other):
         return self.path < other.path or (self.path == other.path and self.time < other.time)
@@ -42,5 +56,7 @@ class Hold(Note):
     """
     hold音符
     :ivar interval: 持续时间
+    :ivar interval: 玩家hold时间
     """
     interval: float
+    tail_decision: DecisionLevel

@@ -1,31 +1,35 @@
 import pygame
 from config import *
+from sprites.abstract import AbstractNoteSprite
 
 
-class TapSprite(pygame.sprite.Sprite):
-    tapimg = pygame.image.load("./src/img/tap.png")
+class TapNoteSprite(AbstractNoteSprite):
+    tapimg = pygame.image.load(resource_path("./res/img/tap.png"))
+    holdimg = pygame.image.load(resource_path("./res/img/hold.png"))
+    grayed_holdimg = pygame.image.load(resource_path("./res/img/hold_gray.png"))
 
-    def __init__(self, gametime, decision_time, calc_midbottom, parent: pygame.sprite.Sprite = None):
-        super().__init__()
-        # tr = TapSprite.tapimg.get_rect()
-        # self.image = pygame.transform.scale(TapSprite.tapimg, (WD_WID / 640 * tr[0], WD_WID / 640 * tr[1]))
-        self.image = TapSprite.tapimg
-        self.parent = parent
+    def __init__(self, decision_time, fn_calc_midbottom, parent: pygame.sprite.Sprite = None):
+        super().__init__(decision_time, fn_calc_midbottom, parent)
+        self.image = TapNoteSprite.tapimg
         self.rect = self.image.get_rect()
-        self.calc_midbottom = calc_midbottom
-        self.decision_time = decision_time
-        self.update(gametime)
+
+    @staticmethod
+    def gen_default_fn(flow_speed: float, decision_pos: int, init_pos: int):
+        def f(gametime: float, decision_time: float):
+            return 0, decision_pos + (init_pos - decision_pos) * (decision_time - gametime) / 5000 * flow_speed
+
+        return f
+
+
+
+class HoldStartNoteSprite(TapNoteSprite):
+    def __init__(self, decision_time, bottom_pos, fn_calc_midbottom, parent: pygame.sprite.Sprite = None):
+        super().__init__(decision_time, fn_calc_midbottom, parent)
+        self.image = self.holdimg
+        self.bottom_pos = bottom_pos
 
     def update(self, gametime):
-        if self.parent is not None:
-            t1 = self.calc_midbottom(gametime, self.decision_time)
-            t2 = self.parent.rect.midbottom
-            self.rect.midbottom = (t1[0] + t2[0], t1[1])
+        if gametime < self.decision_time:
+            super().update(gametime)
         else:
-            self.rect.midbottom = self.calc_midbottom(gametime, self.decision_time)
-
-
-def linear_calc_midbottom(flow_speed: float, decision_pos: int, init_pos: int):
-    def f(gametime: float, decision_time):
-        return 0, decision_pos + (init_pos - decision_pos) * (decision_time - gametime) / 5000 * flow_speed
-    return f
+            self.rect.midbottom = (self.parent.rect.midbottom[0], self.bottom_pos)

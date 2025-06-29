@@ -54,3 +54,6 @@ htmlcov/
 .cache
 coverage.xml
 *.cover
+
+rawchart
+.VSCodeCounter/

@@ -1,3 +1,5 @@
+import os.path
+
 import scenes
 import pygame
 import pygame_gui as gui
@@ -8,7 +10,8 @@ from gamedata.score import Score
 class GameOverScene(scenes.Scene):
     def __init__(self, main_window: pygame.Surface, clock: pygame.Clock):
         super().__init__(main_window, clock)
-        self.uimgr = gui.UIManager((WD_WID, WD_HEI), theme_path="./src/theme/gameover.json")
+        self.uimgr = gui.UIManager((WD_WID, WD_HEI),
+                                   theme_path=resource_path('res/theme/gameover.json'))
         layout_rect = pygame.Rect(0, 0, WD_WID * 0.8, 50)
         layout_rect.center = (WD_WID * 0.5, WD_HEI * 0.2)
         self.badge_label = gui.elements.UILabel(layout_rect, "", self.uimgr)
@@ -33,16 +36,18 @@ class GameOverScene(scenes.Scene):
 
     def main_loop(self, *args, **kwargs) -> tuple[scenes.Scene | None, list, dict]:
         score: Score = kwargs['score']
-        retry_which: str = kwargs['retry_which']
+        retry_which = kwargs['retry_which']
 
-        self.badge_label.set_text(f"{'AP' if score.is_ap else '  '} {'FC+' if score.is_fcplus else '   '}"
+        self.badge_label.set_text(f"{'AP' if score.is_ap else '  '}  {'FC+' if score.is_fcplus else '   '}  "
                                   f"{'FC' if score.is_fc else '  '}")
         self.perfects_label.set_text(f"Perfect: {score.perfects}")
         self.greats_label.set_text(f"Greats: {score.greats}")
         self.goods_label.set_text(f"Goods: {score.goods}")
         self.misses_label.set_text(f"Misses: {score.misses}")
         self.maxcombo_label.set_text(f"Max Combo: {score.max_combo}")
-        self.score_label.set_text(f"Score: {score.score}")
+        t = score.score / score.max_score * 100
+        self.score_label.set_text(f"SCORE: {score.score:0>8} "
+                                  f"({'0' if t < 100 else ''}{'0' if t < 10 else ''}{t:3.6f}%)")
 
         going = True
 
@@ -54,12 +59,12 @@ class GameOverScene(scenes.Scene):
                     match event.ui_element:
                         case self.retry_button:
                             return (scenes.GameScene(self.main_window, self.clock), [],
-                                    {"trackfile_name": retry_which})
+                                    {"trackfile": retry_which})
                         case self.exit_button:
                             return scenes.MainScene(self.main_window, self.clock), [], {}
                 self.uimgr.process_events(event)
             delta = self.clock.tick(FPS)
-            self.main_window.fill((255, 255, 255))
+            self.main_window.fill(THEME_COLOR)
             self.uimgr.update(delta / 1000)
             self.uimgr.draw_ui(self.main_window)
 

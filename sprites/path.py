@@ -1,16 +1,31 @@
+import threading
+import time
+
 import pygame
 from config import *
 
 
 class PathSprite(pygame.sprite.Sprite):
-    pathimg = pygame.image.load("./src/img/path.png")
+    unpressed_img = pygame.image.load(resource_path("./res/img/path.png"))
+    pressed_img = pygame.image.load(resource_path("./res/img/path_hl.png"))
 
     def __init__(self, pathid: int):
         super().__init__()
-        self.id = pathid
-        # tr = PathSprite.pathimg.get_rect()
-        # self.image = pygame.transform.scale(PathSprite.pathimg, (WD_WID / 640 * tr[0], WD_WID / 640 * tr[1]))
-        self.image = PathSprite.pathimg
-        self.rect = self.image.get_rect()
-        self.rect.midtop = ((pathid * 2 + 1) / (2 * PATHS) * 640, 0)
+        self.image = PathSprite.unpressed_img
 
+        self.rect = self.image.get_rect()
+        self.rect.center = (pathid * 2 + 1) / (2 * PATHS) * 960, 540
+
+    def tap(self):
+        self.pressed()
+
+        def targ():
+            time.sleep(0.1)
+            self.released()
+        threading.Thread(target=targ).start()
+
+    def pressed(self):
+        self.image = PathSprite.pressed_img
+
+    def released(self):
+        self.image = PathSprite.unpressed_img
