@@ -1,3 +1,6 @@
+import json
+
+
 def random_generate():
     """为了测试先随机生成个谱面"""
     trkdata = {'duration_ms': 60000, 'bpm': 75, 'title': 'RANDOM', 'artist': 'None',
