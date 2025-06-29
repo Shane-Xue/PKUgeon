@@ -225,7 +225,8 @@ class GameScene(scenes.Scene):
             self.pause_guimgr.update(self.clock.get_time() / 1000)
             self.side_board_guimgr.draw_ui(self.main_window)
             self.main_window.blit(self.game_renderer.render(), (0, 0))
-            self.delta_bar_group.draw(self.main_window)
+            if not self.auto_play:
+                self.delta_bar_group.draw(self.main_window)
             self.decision_label_group.draw(self.main_window)
             self.progress_bar.update_bar(self.game_renderer.get_time())
             self.pause_guimgr.draw_ui(self.main_window)
