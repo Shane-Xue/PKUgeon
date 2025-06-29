@@ -1,24 +1,3 @@
-import pygame
-import json
-import scenes
-from config import *
-from gamedata.mediaplayer import MediaPlayer, SEID
-
-
-def main():
-    pygame.init()
-    MediaPlayer.init()
-    MediaPlayer.global_player.play_sound_effect(SEID.ENTRY)
-    screen = pygame.display.set_mode((WD_WID, WD_HEI), pygame.FULLSCREEN | pygame.SCALED)
-    clock = pygame.time.Clock()
-
-    current_scn = scenes.MainScene(screen, clock)
-    args = []
-    kwargs = {}
-    while current_scn is not None:
-        current_scn, args, kwargs = current_scn.main_loop(*args, **kwargs)
-
-
 def random_generate():
     """为了测试先随机生成个谱面"""
     trkdata = {'duration_ms': 60000, 'bpm': 75, 'title': 'RANDOM', 'artist': 'None',
@@ -50,8 +29,3 @@ def random_generate():
             t += 1000 / 8
     with open('save/trackfile/demo/demo', 'w') as file:
         json.dump(trkdata, file)
-
-
-if __name__ == '__main__':
-    # random_generate()
-    main()
