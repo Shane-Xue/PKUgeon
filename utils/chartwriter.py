@@ -26,6 +26,12 @@ class ChartWriter:
             return nd.Hold(type, time, path, nd.DecisionLevel.NONE, 0, interval, nd.DecisionLevel.NONE)
         else:
             raise ValueError("Invalid note type")
+        
+    def create_note_by_time(self, type: nd.NoteType, time: int, path: int, interval: int = None):
+        if type == nd.NoteType.TAP:
+            return nd.Note(type, time, path, nd.DecisionLevel.NONE, 0)
+        elif type == nd.NoteType.HOLD:
+            return nd.Hold(type, time, path, nd.DecisionLevel.NONE, 0, interval, nd.DecisionLevel.NONE)
 
     def create_chart(self, bpm: int, duration_ms: int, start_time: int = 0, title: str = "Unknown", artist: str = "Unknown", chart_maker: str = "Unknown", level: int = 0):
         self.track_file.bpm = bpm
@@ -41,6 +47,10 @@ class ChartWriter:
 
     def add_note(self, type: nd.NoteType, start: int, path: int, end: int = None):
         note = self.create_note(type, start, path, end)
+        self.track_file.add(note)
+
+    def add_note_by_time(self, type: nd.NoteType, time: int, path: int, interval: int = None):
+        note = self.create_note_by_time(type, time, path, interval)
         self.track_file.add(note)
 
     def remove_note(self, type: nd.NoteType, start: int, path: int, end: int = None):

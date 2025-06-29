@@ -8,3 +8,4 @@ from .gameover_scene import GameOverScene
 from .chart_info_scene import ChartInfoScene
 from .setting_scene import SettingScene
 from .chart_selection_scene import ChartSelectionScene
+from .chart_import_scene import ChartImportScene

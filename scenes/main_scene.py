@@ -33,7 +33,7 @@ class MainScene(scenes.Scene):
         self.settings_button = gui.elements.UIButton(
             pygame.Rect((WD_WID * 0.05, WD_HEI * 0.68), (WD_WID * 0.1, WD_HEI * 0.09)),
             "Settings", manager=self.uimgr)
-        self.chart_maker_button.disable()
+        # self.chart_maker_button.disable()
         self.title_label = gui.elements.UILabel(pygame.Rect(WD_WID * 0.05, WD_HEI * 0.18, WD_WID * 0.4, 100),
                                                 "PKUgeon: Music Game", manager=self.uimgr)
         self.title_img = pygame.image.load(resource_path('res/img/title.png'))
@@ -65,7 +65,7 @@ class MainScene(scenes.Scene):
                         case self.exit_button:
                             return None, [], {}
                         case self.chart_maker_button:
-                            print("chart maker not implemented")
+                            return (scenes.ChartImportScene(self.main_window, self.clock), [], {})
                         case self.settings_button:
                             return (scenes.SettingScene(self.main_window, self.clock), [], {})
                 elif event.type == en.PLAY_MUSIC:
