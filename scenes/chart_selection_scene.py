@@ -26,7 +26,7 @@ class ChartSelectionScene(Scene):
         self.charts = [
             gui.elements.UIButton(
                 pygame.Rect(0, i * 0.12 * WD_HEI, 0.45 * WD_WID, 0.1 * WD_HEI),
-                f"{track['title']} BPM:{track['bpm']} LV{0}",
+                f"{track['title']} BPM:{track['bpm']} LV{track['level']}",
                 self.uimgr,
                 self.selection_container,
                 object_id = f"#track_{i}",
