@@ -43,7 +43,7 @@ def generate_music(src_path: str, dest_dir: str):
     # duration_ms = int(audio.info.length * 1000)
     # return duration_ms
 
-def generate_chart(src_path: str, dest_dir: str, name: str, duration: int, bpm: int):
+def generate_chart(src_path: str, dest_dir: str, name: str, duration: int, bpm: int, difficulty: int):
     chart = ChartWriter(name)
     # 默认值
     title = 'Unknown'
@@ -102,5 +102,6 @@ def generate_chart(src_path: str, dest_dir: str, name: str, duration: int, bpm: 
     chart.track_file.title = title
     chart.track_file.artist = artist
     chart.track_file.chart_maker = chart_maker
+    chart.track_file.level = difficulty
     chart.save()
 

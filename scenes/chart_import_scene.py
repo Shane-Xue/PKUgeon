@@ -118,7 +118,7 @@ class ChartImportScene(scenes.Scene):
         chart_generater.generate_cover(self.info.cover_path, div_path)
         chart_generater.generate_music(self.info.music_path, div_path)
         chart_generater.generate_chart(self.info.chart_path, div_path, self.info.name,
-                                                               self.info.duration_ms, self.info.bpm)    
+                                    self.info.duration_ms, self.info.bpm, self.info.difficulty)    
 
     def main_loop(self, *args, **kwargs) -> tuple[scenes.Scene | None, list, dict]:
         running = True
