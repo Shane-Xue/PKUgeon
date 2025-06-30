@@ -39,9 +39,9 @@ def generate_music(src_path: str, dest_dir: str):
     if not os.path.exists(src_path):
         raise FileNotFoundError(f"Source music file {src_path} does not exist.")
     shutil.copy(src_path, dest_path)
-    audio = MP3(dest_path)
-    duration_ms = int(audio.info.length * 1000)
-    return duration_ms
+    # audio = MP3(dest_path)
+    # duration_ms = int(audio.info.length * 1000)
+    # return duration_ms
 
 def generate_chart(src_path: str, dest_dir: str, name: str, duration: int, bpm: int):
     chart = ChartWriter(name)

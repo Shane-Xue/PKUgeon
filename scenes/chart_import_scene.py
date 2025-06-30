@@ -13,10 +13,18 @@ import event_number as en
 import chart_generater
 
 class basicinfo:
-    def __init__(self, name: str, bpm: int, duration_ms: int):
-        self.name = name
-        self.bpm = bpm
-        self.duration_ms = duration_ms
+    def __init__(self):
+        self.name = None
+        self.bpm = None
+        self.duration_ms = None
+        self.difficulty = None
+        self.cover_path = None
+        self.music_path = None
+        self.chart_path = None
+
+    def is_complete(self):
+        return all([self.name, self.bpm, self.duration_ms, self.difficulty,
+                    self.cover_path, self.music_path, self.chart_path])
 
 
 class ChartImportScene(scenes.Scene):
@@ -63,6 +71,12 @@ class ChartImportScene(scenes.Scene):
         self.chart_dura_entry = gui.elements.UITextEntryLine(
             pygame.Rect(ts[0] * 0.38, ts[1] * 0.4, ts[0] * 0.3, 50),
             manager=self.import_mgr, container=self.import_menu,)
+        self.chart_diffi_label = gui.elements.UILabel(
+            pygame.Rect(ts[0] * 0.05, ts[1] * 0.5, ts[0] * 0.3, 50),
+            "difficulty:", manager=self.import_mgr, container=self.import_menu)
+        self.chart_diffi_entry = gui.elements.UITextEntryLine(
+            pygame.Rect(ts[0] * 0.38, ts[1] * 0.5, ts[0] * 0.3, 50),
+            manager=self.import_mgr, container=self.import_menu,)
         self.import_cover_button = gui.elements.UIButton(
             pygame.Rect(ts[0] * 0.7, ts[1] * 0.2, ts[0] * 0.25, 50),
             "Upload Cover", manager=self.import_mgr, container=self.import_menu)
@@ -72,8 +86,12 @@ class ChartImportScene(scenes.Scene):
         self.import_chart_button = gui.elements.UIButton(
             pygame.Rect(ts[0] * 0.7, ts[1] * 0.4, ts[0] * 0.25, 50),
             "Upload Chart", manager=self.import_mgr, container=self.import_menu)
+        self.import_save_button = gui.elements.UIButton(
+            pygame.Rect(ts[0] * 0.7, ts[1] * 0.5, ts[0] * 0.25, 50),
+            "Save", manager=self.import_mgr, container=self.import_menu)
+        self.import_save_button.disable()  # Initially disable save button until all fields are filled
         self.import_quit_button = gui.elements.UIButton(
-            pygame.Rect(ts[0] * 0.38, ts[1] * 0.5, ts[0] * 0.3, 50),
+            pygame.Rect(ts[0] * 0.4, ts[1] * 0.6, ts[0] * 0.25, 50),
             "Quit", manager=self.import_mgr, container=self.import_menu)
         
 
@@ -81,7 +99,26 @@ class ChartImportScene(scenes.Scene):
         self.img_file_dialog = None
         self.music_file_dialog = None
         self.chart_file_dialog = None
+        self.info = None
 
+    def get_path(self, file_path: str):
+        match self.flag:
+            case 1:  # cover
+                self.info.cover_path = file_path
+                self.import_cover_button.set_text(os.path.basename(file_path))
+            case 2:  # music
+                self.info.music_path = file_path
+                self.import_music_button.set_text(os.path.basename(file_path))
+            case 3:  # chart
+                self.info.chart_path = file_path
+                self.import_chart_button.set_text(os.path.basename(file_path))
+
+    def save_chart(self):
+        div_path = chart_generater.generate_chart_div(self.info.name)   
+        chart_generater.generate_cover(self.info.cover_path, div_path)
+        chart_generater.generate_music(self.info.music_path, div_path)
+        chart_generater.generate_chart(self.info.chart_path, div_path, self.info.name,
+                                                               self.info.duration_ms, self.info.bpm)    
 
     def main_loop(self, *args, **kwargs) -> tuple[scenes.Scene | None, list, dict]:
         running = True
@@ -98,12 +135,14 @@ class ChartImportScene(scenes.Scene):
                             self.import_menu.show() 
                             self.detailed = True
                             self.import_button.disable()
+                            self.info = basicinfo()
                         case self.exit_button:
                             return scenes.MainScene(self.main_window, self.clock), [], {}
                         case self.import_quit_button:
                             self.import_menu.hide()
                             self.detailed = False
                             self.import_button.enable()
+                            self.info = None
                             self.flag = 0
                         case self.import_cover_button:
                             self.flag = 1
@@ -127,6 +166,9 @@ class ChartImportScene(scenes.Scene):
                                 always_on_top = True 
                             )
                             # self.music_file_dialog.show()
+                        case self.import_save_button:
+                            if self.info and self.info.is_complete():
+                                self.save_chart()
                         case self.import_chart_button:
                             self.flag = 3
                             self.chart_file_dialog = gui.windows.UIFileDialog(
@@ -134,26 +176,31 @@ class ChartImportScene(scenes.Scene):
                                 manager = self.import_mgr,
                                 window_title = 'Choose Chart File',
                                 allow_picking_directories = False,
-                                allowed_suffixes =  ['.json'], # 根据需求筛选
+                                allowed_suffixes =  ['.osu'], # 根据需求筛选
                                 always_on_top = True
                             )
                             # self.chart_file_dialog.show()
                 elif event.type == gui.UI_TEXT_ENTRY_FINISHED:
                     if event.ui_element == self.chart_name_entry:
-                        self.chart_name = event.text
+                        self.info.name = event.text
                     elif event.ui_element == self.chart_bpm_entry:
                         try:
-                            self.chart_bpm = int(event.text)
+                            self.info.bpm = int(event.text)
                         except ValueError:
-                            self.chart_bpm = 120
+                            self.info.bpm = 0
                     elif event.ui_element == self.chart_dura_entry:
                         try:
-                            self.chart_dura = int(event.text)
+                            self.info.duration_ms = int(event.text)
                         except ValueError:
-                            self.chart_dura = 0
+                            self.info.duration_ms = 0
+                    elif event.ui_element == self.chart_diffi_entry:
+                        try:
+                            self.info.difficulty = int(event.text)
+                        except ValueError:
+                            self.info.difficulty = 0
                 elif event.type == gui.UI_FILE_DIALOG_PATH_PICKED:
-                    # TODO
-                    continue
+                    self.get_path(event.text)
+                    # print(f"Selected path: {event.text}")
                 elif event.type == gui.UI_WINDOW_CLOSE:
                     if event.ui_element == self.img_file_dialog:
                         self.img_file_dialog = None
@@ -167,6 +214,10 @@ class ChartImportScene(scenes.Scene):
             self.uimgr.update(time_delta)
             self.import_mgr.update(time_delta)
             self.main_window.fill(THEME_COLOR)
+            if self.info and self.info.is_complete():
+                self.import_save_button.enable()
+            else:
+                self.import_save_button.disable()
             self.uimgr.draw_ui(self.main_window)
             self.import_mgr.draw_ui(self.main_window)
             pygame.display.flip()
